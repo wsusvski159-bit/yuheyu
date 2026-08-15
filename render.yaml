@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: yuheyu-mcp
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: YUHEYU_SYNC_TOKEN
+        generateValue: true
+      - key: YUHEYU_MCP_SECRET
+        generateValue: true

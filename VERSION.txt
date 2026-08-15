@@ -1,0 +1,4 @@
+屿和鱼 ChatGPT / MCP 接入版 v1
+基于：yu-he-yu-v5-4-memory-bridge
+兼容：屿和鱼 v5.5 / yuheyu.shared-memory.v2 备份数据
+生成日期：2026-08-15
