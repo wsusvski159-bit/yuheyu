@@ -5,18 +5,27 @@ import { randomUUID } from "node:crypto";
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
 import { toNodeHandler } from "@modelcontextprotocol/node";
 import * as z from "zod/v4";
+import { createClient } from "@supabase/supabase-js";
 
 const PORT = Number(process.env.PORT || 3000);
 const SYNC_TOKEN = String(process.env.YUHEYU_SYNC_TOKEN || "").trim();
 const MCP_SECRET = String(process.env.YUHEYU_MCP_SECRET || "").trim();
 const DATA_FILE = resolve(process.env.YUHEYU_DATA_FILE || "./data/yuheyu.json");
 const ALLOWED_ORIGIN = String(process.env.YUHEYU_ALLOWED_ORIGIN || "*").trim() || "*";
+const SUPABASE_URL = String(process.env.SUPABASE_URL || "").trim();
+const SUPABASE_SECRET_KEY = String(process.env.SUPABASE_SECRET_KEY || "").trim();
+const SUPABASE_TABLE = String(process.env.SUPABASE_TABLE || "yuheyu_store").trim() || "yuheyu_store";
+const USE_SUPABASE = Boolean(SUPABASE_URL && SUPABASE_SECRET_KEY);
+const supabase = USE_SUPABASE
+  ? createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null;
 const MCP_PATH = MCP_SECRET ? `/mcp/${encodeURIComponent(MCP_SECRET)}` : "/mcp";
 const MAX_BODY_BYTES = 6 * 1024 * 1024;
 const COLLECTIONS = ["letters", "jiangyuDiaries", "todayEntries", "memories", "songs"];
 
 if (!SYNC_TOKEN) console.warn("[yuheyu] YUHEYU_SYNC_TOKEN is empty; sync API will reject requests.");
 if (!MCP_SECRET) console.warn("[yuheyu] YUHEYU_MCP_SECRET is empty; MCP endpoint is not protected by a private path.");
+if (!USE_SUPABASE) console.warn("[yuheyu] SUPABASE_URL / SUPABASE_SECRET_KEY missing; falling back to local file storage.");
 
 function nowIso() {
   return new Date().toISOString();
@@ -159,6 +168,22 @@ function mergeData(aRaw, bRaw) {
 let writeQueue = Promise.resolve();
 
 async function loadStore() {
+  if (USE_SUPABASE) {
+    const { data: row, error } = await supabase
+      .from(SUPABASE_TABLE)
+      .select("version,revision,updated_at,data")
+      .eq("id", "main")
+      .maybeSingle();
+    if (error) throw new Error(`Supabase 读取失败：${error.message}`);
+    if (!row) return { version: 1, revision: 0, updatedAt: "", data: emptyData() };
+    return {
+      version: Number(row.version) || 1,
+      revision: Number(row.revision) || 0,
+      updatedAt: cleanTimestamp(row.updated_at) || "",
+      data: normalizeData(row.data),
+    };
+  }
+
   try {
     const parsed = JSON.parse(await readFile(DATA_FILE, "utf8"));
     return {
@@ -177,6 +202,22 @@ async function saveStore(data) {
   writeQueue = writeQueue.then(async () => {
     const current = await loadStore();
     saved = { version: 1, revision: current.revision + 1, updatedAt: nowIso(), data: mergeData(current.data, data) };
+
+    if (USE_SUPABASE) {
+      const { error } = await supabase.from(SUPABASE_TABLE).upsert(
+        {
+          id: "main",
+          version: saved.version,
+          revision: saved.revision,
+          updated_at: saved.updatedAt,
+          data: saved.data,
+        },
+        { onConflict: "id" },
+      );
+      if (error) throw new Error(`Supabase 保存失败：${error.message}`);
+      return;
+    }
+
     await mkdir(dirname(DATA_FILE), { recursive: true });
     const temp = `${DATA_FILE}.${process.pid}.tmp`;
     await writeFile(temp, JSON.stringify(saved, null, 2), "utf8");
@@ -372,7 +413,7 @@ const httpServer = createServer(async (req, res) => {
       return;
     }
     if (url.pathname === "/health") {
-      json(res, 200, { ok: true, app: "屿和鱼 MCP", mcpPath: MCP_PATH });
+      json(res, 200, { ok: true, app: "屿和鱼 MCP", mcpPath: MCP_PATH, storage: USE_SUPABASE ? "supabase" : "local-file" });
       return;
     }
     if (url.pathname === "/api/status") {
@@ -404,4 +445,5 @@ httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`[yuheyu] listening on :${PORT}`);
   console.log(`[yuheyu] MCP endpoint: ${MCP_PATH}`);
   console.log("[yuheyu] sync API: /api/sync");
+  console.log(`[yuheyu] storage: ${USE_SUPABASE ? `supabase:${SUPABASE_TABLE}` : DATA_FILE}`);
 });
