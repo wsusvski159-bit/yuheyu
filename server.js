@@ -413,7 +413,7 @@ const httpServer = createServer(async (req, res) => {
       return;
     }
     if (url.pathname === "/health") {
-      json(res, 200, { ok: true, app: "屿和鱼 MCP", mcpPath: MCP_PATH, storage: USE_SUPABASE ? "supabase" : "local-file" });
+      json(res, 200, { ok: true, app: "屿和鱼 MCP", storage: USE_SUPABASE ? "supabase" : "local-file" });
       return;
     }
     if (url.pathname === "/api/status") {
@@ -443,7 +443,7 @@ const httpServer = createServer(async (req, res) => {
 
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`[yuheyu] listening on :${PORT}`);
-  console.log(`[yuheyu] MCP endpoint: ${MCP_PATH}`);
+  console.log("[yuheyu] MCP endpoint configured");
   console.log("[yuheyu] sync API: /api/sync");
   console.log(`[yuheyu] storage: ${USE_SUPABASE ? `supabase:${SUPABASE_TABLE}` : DATA_FILE}`);
 });
