@@ -45,6 +45,7 @@ function makeSyncPayload() {
     todayEntries: state.todayEntries.map(withoutImages),
     memories: state.memories.map(withoutImages),
     songs: state.songs.map(withoutImages),
+    observationPosts: JSON.parse(JSON.stringify(state.observationPosts || [])),
     messages: JSON.parse(JSON.stringify(state.messages || {})),
     syncMeta: JSON.parse(JSON.stringify(state.syncMeta || { deleted: {} })),
   };
@@ -106,6 +107,9 @@ function mergeRemoteIntoLocal(remote) {
     xiaoyu: chooseMessage(state.messages?.xiaoyu, remote.messages?.xiaoyu) || { text: "", savedAt: "" },
     ai: chooseMessage(state.messages?.ai, remote.messages?.ai) || { text: "", savedAt: "" },
   };
+  if (Array.isArray(remote.observationPosts)) {
+    state.observationPosts = remote.observationPosts;
+  }
   state.syncMeta = { deleted };
   state = normalizeState(state);
 }

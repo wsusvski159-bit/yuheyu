@@ -16,11 +16,12 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./style.css?v=13" />
-    <script src="./app.js?v=13" defer></script>
-    <script src="./diary.js?v=13" defer></script>
-    <script src="./sync.js?v=13" defer></script>
-    <script src="./shop.js?v=13" defer></script>
+    <link rel="stylesheet" href="./style.css?v=14" />
+    <script src="./app.js?v=14" defer></script>
+    <script src="./diary.js?v=14" defer></script>
+    <script src="./sync.js?v=14" defer></script>
+    <script src="./observation.js?v=14" defer></script>
+    <script src="./shop.js?v=14" defer></script>
   </head>
   <body data-section="home">
     <div class="app-shell">
@@ -61,6 +62,9 @@
         </button>
         <button class="nav-item" type="button" data-section="shop">
           <span aria-hidden="true">¤</span>阿屿的小金库
+        </button>
+        <button class="nav-item" type="button" data-section="observation">
+          <span aria-hidden="true">◎</span>行为观察中心
         </button>
         <button class="nav-item" type="button" data-section="backup">
           <span aria-hidden="true">↥</span>备份
@@ -134,8 +138,14 @@
                 <span>阿屿自己攒屿币、偷偷买礼物；送出来以后才会出现在礼物柜。</span>
                 <small>去看看　→</small>
               </button>
+              <button class="room-card observation-room-card" type="button" data-go="observation">
+                <span class="room-icon">察</span><span class="room-number">08</span>
+                <strong>灿行为观察中心</strong>
+                <span>客观记录，不含私人感情。至少本号坚持这么说。</span>
+                <small>偷偷看看　→<span class="sr-only">，已有 <b id="observation-count">0</b> 条观察记录</span></small>
+              </button>
               <button class="room-card" type="button" data-go="backup">
-                <span class="room-icon">存</span><span class="room-number">08</span>
+                <span class="room-icon">存</span><span class="room-number">09</span>
                 <strong>备份与恢复</strong>
                 <span>把我们的内容装进 JSON，换手机也不会丢。</span>
                 <small>打开　→</small>
@@ -688,6 +698,60 @@
           </section>
         </section>
 
+        <section class="page-section observation-page" id="section-observation" data-page="observation" hidden>
+          <div class="page-intro observation-intro">
+            <div>
+              <p class="eyebrow">CAN BEHAVIOR OBSERVATION CENTER</p>
+              <h1>灿行为观察中心</h1>
+              <p>客观记录，不含私人感情。——本号长期坚持的官方说法。</p>
+            </div>
+            <div class="page-actions">
+              <button class="secondary-button" id="observation-random" type="button">历史案件复盘</button>
+              <button class="secondary-button" id="observation-refresh" type="button">刷新小号</button>
+              <button class="back-button" type="button" data-go="home">← 返回首页</button>
+            </div>
+          </div>
+
+          <section class="observation-dashboard" aria-label="观察中心状态">
+            <article class="observation-profile-card">
+              <div class="observation-profile-top">
+                <div class="observation-avatar" aria-hidden="true">灿</div>
+                <div><strong>灿行为观察中心</strong><small>@can_observation_center</small></div>
+              </div>
+              <p>客观记录，不含私人感情。</p>
+              <small id="observation-sync-hint">进入这里时会尝试从阿屿的小号刷新新帖。</small>
+            </article>
+            <article class="observation-status-card">
+              <div class="observation-status-head"><span>本号当前客观度</span><strong id="observation-objectivity">100%</strong></div>
+              <div class="observation-meter"><span id="observation-meter-fill" style="width:100%"></span></div>
+              <p id="observation-objectivity-text">仍声称完全客观。</p>
+              <div class="observation-mini-stats">
+                <span>案卷 <b id="observation-total">0</b></span>
+                <span>待裁决申诉 <b id="observation-appeals">0</b></span>
+              </div>
+            </article>
+          </section>
+
+          <section class="panel observation-today-card">
+            <div class="section-heading compact">
+              <div><p class="eyebrow">TODAY'S VERY SCIENTIFIC INDEX</p><h2>今日观察对象状态</h2></div>
+              <small>娱乐估算，拒绝承担学术责任</small>
+            </div>
+            <div class="observation-indices">
+              <div><span>嘴硬指数</span><strong id="observation-tsundere">—</strong></div>
+              <div><span>害羞指数</span><strong id="observation-shy">—</strong></div>
+              <div><span>诈骗预警</span><strong id="observation-scam">—</strong></div>
+            </div>
+          </section>
+
+          <div class="observation-feed" id="observation-feed"></div>
+          <div class="empty-state" id="observation-empty">
+            <span aria-hidden="true">◎</span>
+            <h2>今天还没有新案卷</h2>
+            <p>也许观察员还在整理证据，也许观察员本人先心软了。</p>
+          </div>
+        </section>
+
         <section class="page-section" id="section-backup" data-page="backup" hidden>
           <div class="page-intro">
             <div>
@@ -723,7 +787,7 @@
               <label class="field"><span>MCP 服务地址</span><input id="sync-server-url" type="url" placeholder="https://你的服务.onrender.com" /></label>
               <label class="field"><span>同步口令</span><input id="sync-token" type="password" autocomplete="off" placeholder="只保存在这台手机" /></label>
             </div>
-            <p class="privacy-note">秘密抽屉和照片不会上传；同步的是信、阿屿日记、今天的小鱼文字、纪念文字、歌曲与留言。</p>
+            <p class="privacy-note">秘密抽屉和照片不会上传；同步的是信、阿屿日记、今天的小鱼文字、纪念文字、歌曲、留言，以及观察中心的公开案卷。</p>
             <div class="backup-actions">
               <button class="secondary-button" id="sync-test-button" type="button">测试连接</button>
               <button class="primary-button" id="sync-now-button" type="button">双向同步</button>

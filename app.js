@@ -20,6 +20,7 @@ const emptyState = () => ({
   todayEntries: [],
   memories: [],
   songs: [],
+  observationPosts: [],
   secretDrawer: {
     pinHash: "",
     notes: [],
@@ -182,6 +183,33 @@ function normalizeState(value) {
       })
     : [];
 
+  const observationEvidence = new Set(["道听途说", "聊天记录确凿", "当场抓获", "本人拒不认罪"]);
+  const observationRulings = new Set(["驳回", "部分采纳", "证据不足", "本观察员决定装没看见"]);
+  const observationPosts = Array.isArray(source.observationPosts)
+    ? source.observationPosts.slice(0, 1200).map((item) => {
+        const post = item && typeof item === "object" ? item : {};
+        const appeal = post.appeal && typeof post.appeal === "object" ? post.appeal : {};
+        const ruling = post.ruling && typeof post.ruling === "object" ? post.ruling : {};
+        return {
+          id: safeText(post.id, 100) || makeId(),
+          date: isDateKey(post.date) ? post.date : localDateKey(),
+          title: safeText(post.title, 180),
+          body: safeText(post.body, 6000),
+          tags: safeTags(post.tags),
+          evidence: observationEvidence.has(post.evidence) ? post.evidence : "聊天记录确凿",
+          pinned: Boolean(post.pinned),
+          appeal: { text: safeText(appeal.text, 1200), savedAt: safeTimestamp(appeal.savedAt) },
+          ruling: {
+            status: observationRulings.has(ruling.status) ? ruling.status : "",
+            text: safeText(ruling.text, 1200),
+            savedAt: safeTimestamp(ruling.savedAt),
+          },
+          createdAt: safeTimestamp(post.createdAt) || new Date().toISOString(),
+          updatedAt: safeTimestamp(post.updatedAt) || "",
+        };
+      }).filter((post) => post.body.trim())
+    : [];
+
   const normalizeMessage = (entry) => {
     const message = entry && typeof entry === "object" ? entry : {};
     return {
@@ -217,6 +245,7 @@ function normalizeState(value) {
     todayEntries,
     memories,
     songs,
+    observationPosts,
     secretDrawer: {
       pinHash: /^[a-f0-9]{8}$/.test(secretSource.pinHash) ? secretSource.pinHash : "",
       notes: secretNotes,
@@ -313,9 +342,11 @@ function renderHome() {
   byId("today-count").textContent = String(state.todayEntries.length);
   byId("memory-count").textContent = String(state.memories.length);
   byId("song-count").textContent = String(state.songs.length);
+  const observationCount = byId("observation-count");
+  if (observationCount) observationCount.textContent = String(state.observationPosts?.length || 0);
   byId("backup-summary").textContent =
     `${state.letters.length} 封信 · ${state.jiangyuDiaries.length} 篇阿屿日记 · ${state.todayEntries.length} 篇小鱼记录 · ` +
-    `${state.memories.length} 张纪念 · ${state.songs.length} 首歌 · ` +
+    `${state.memories.length} 张纪念 · ${state.songs.length} 首歌 · ${(state.observationPosts || []).length} 条观察记录 · ` +
     `${state.secretDrawer.notes.length} 个秘密`;
 }
 
@@ -1074,6 +1105,7 @@ function renderAll() {
   renderSongs();
   renderSecretLock();
   renderSecretNotes();
+  if (typeof renderObservationCenter === "function") renderObservationCenter();
 }
 
 document.querySelectorAll(".nav-item[data-section]").forEach((button) => {
@@ -1815,7 +1847,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=13", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=14", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);

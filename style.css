@@ -1987,3 +1987,339 @@ noscript {
     grid-template-columns: 1fr;
   }
 }
+
+/* v1.4 · 灿行为观察中心 */
+.observation-room-card {
+  background:
+    linear-gradient(145deg, rgba(252, 253, 246, 0.98), rgba(239, 243, 230, 0.86));
+}
+
+.observation-dashboard {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.observation-profile-card,
+.observation-status-card {
+  min-height: 180px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(253, 254, 250, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.observation-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.observation-profile-top > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.observation-profile-top strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.observation-profile-top small,
+.observation-profile-card > small {
+  color: var(--muted);
+}
+
+.observation-avatar {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid rgba(122, 130, 106, 0.16);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.1rem;
+}
+
+.observation-profile-card > p {
+  margin: 18px 0 10px;
+  font-size: 0.95rem;
+}
+
+.observation-status-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.observation-status-head span,
+.observation-status-card > p,
+.observation-mini-stats {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.observation-status-head strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.65rem;
+  font-weight: 500;
+}
+
+.observation-meter {
+  height: 8px;
+  margin: 16px 0 11px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(122, 130, 106, 0.1);
+}
+
+.observation-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-deep);
+  transition: width 260ms ease;
+}
+
+.observation-mini-stats {
+  display: flex;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.observation-mini-stats b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.observation-today-card {
+  margin-bottom: 14px;
+}
+
+.observation-indices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.observation-indices > div {
+  display: grid;
+  gap: 7px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper-soft);
+}
+
+.observation-indices span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.observation-indices strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.03rem;
+  font-weight: 500;
+}
+
+.observation-feed {
+  display: grid;
+  gap: 13px;
+}
+
+.observation-post {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(253, 254, 250, 0.94);
+  box-shadow: var(--shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.observation-post.is-pinned {
+  background:
+    linear-gradient(145deg, rgba(253, 254, 250, 0.98), rgba(242, 245, 234, 0.96));
+}
+
+.observation-post.is-reviewing {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 55px rgba(98, 107, 83, 0.16);
+}
+
+.observation-post-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.observation-post-head > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.observation-post-head strong {
+  font-size: 0.82rem;
+}
+
+.observation-post-head small {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.observation-badges,
+.observation-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.observation-badges {
+  justify-content: flex-end;
+}
+
+.observation-badges span,
+.observation-tag {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 0.68rem;
+}
+
+.observation-post h2 {
+  margin: 17px 0 6px;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.04rem;
+  font-weight: 600;
+}
+
+.observation-post-body {
+  margin: 15px 0;
+  white-space: pre-wrap;
+  line-height: 1.85;
+}
+
+.observation-appeal-wrap {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.observation-appeal,
+.observation-ruling {
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: var(--paper-soft);
+}
+
+.observation-ruling {
+  margin-top: 8px;
+  background: rgba(237, 241, 229, 0.72);
+}
+
+.observation-appeal-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.observation-appeal-title strong,
+.observation-ruling strong {
+  font-size: 0.76rem;
+}
+
+.observation-appeal-title small,
+.observation-waiting {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.observation-appeal p,
+.observation-ruling p {
+  margin: 7px 0 0;
+  white-space: pre-wrap;
+  line-height: 1.65;
+  font-size: 0.84rem;
+}
+
+.observation-waiting {
+  display: block;
+  margin: 9px 2px 0;
+}
+
+.observation-appeal-button {
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent-deep);
+  font-size: 0.72rem;
+}
+
+.observation-appeal-form {
+  margin-top: 13px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper-soft);
+}
+
+.observation-appeal-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.observation-appeal-form textarea {
+  min-height: 105px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.observation-appeal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 620px) {
+  .observation-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .observation-profile-card,
+  .observation-status-card {
+    min-height: 0;
+  }
+
+  .observation-indices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .observation-indices > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .observation-post-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .observation-badges {
+    justify-content: flex-start;
+  }
+}
