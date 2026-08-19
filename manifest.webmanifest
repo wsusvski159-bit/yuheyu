@@ -7,9 +7,12 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#f5f5ed",
-  "theme_color": "#f1f3e8",
-  "categories": ["lifestyle", "utilities"],
+  "background_color": "#f6f3e9",
+  "theme_color": "#f6f3e9",
+  "categories": [
+    "lifestyle",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",

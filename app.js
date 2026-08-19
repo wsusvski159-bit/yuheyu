@@ -9,6 +9,14 @@ const LETTER_CODE_PREFIX = "YUHEYU_LETTER_V1:";
 const MEMORY_CODE_PREFIX = "YUHEYU_MEMORY_V1:";
 const RELATIONSHIP_START = "2026-07-23";
 const CHATGPT_URL = "https://chatgpt.com/";
+const THEME_STORAGE_KEY = "yuheyu.theme.v1";
+const THEME_NAMES = new Set(["butter-mint", "blush", "mist-blue", "lavender"]);
+const THEME_META_COLORS = {
+  "butter-mint": "#f6f3e9",
+  blush: "#f6f1ee",
+  "mist-blue": "#f1f3f3",
+  lavender: "#f3f0f3",
+};
 const sectionNames = new Set([...document.querySelectorAll("[data-page]")].map((section) => section.dataset.page).filter(Boolean));
 const songResults = new Set(["还没猜", "猜中了", "没猜中", "一起听过"]);
 const moodOptions = new Set(["开心", "平静", "想你", "害羞", "委屈", "疲惫"]);
@@ -44,6 +52,52 @@ let installPrompt = null;
 
 function byId(id) {
   return document.getElementById(id);
+}
+
+function loadTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    return THEME_NAMES.has(saved) ? saved : "butter-mint";
+  } catch {
+    return "butter-mint";
+  }
+}
+
+function applyTheme(name, persist = true) {
+  const theme = THEME_NAMES.has(name) ? name : "butter-mint";
+  document.documentElement.dataset.theme = theme;
+  const themeMeta = byId("theme-color");
+  if (themeMeta) themeMeta.setAttribute("content", THEME_META_COLORS[theme] || THEME_META_COLORS["butter-mint"]);
+  document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    const active = button.dataset.themeChoice === theme;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-pressed", "true");
+    else button.setAttribute("aria-pressed", "false");
+  });
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {}
+  }
+}
+
+let activeHomeTab = "home";
+
+function showHomeTab(tab) {
+  const target = new Set(["home", "rooms", "corners"]).has(tab) ? tab : "home";
+  activeHomeTab = target;
+  document.querySelectorAll("[data-home-panel]").forEach((panel) => {
+    const active = panel.dataset.homePanel === target;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+  document.querySelectorAll("[data-home-tab]").forEach((button) => {
+    const active = button.dataset.homeTab === target;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function localDateKey(date = new Date()) {
@@ -342,8 +396,45 @@ function renderHome() {
   byId("today-count").textContent = String(state.todayEntries.length);
   byId("memory-count").textContent = String(state.memories.length);
   byId("song-count").textContent = String(state.songs.length);
+
   const observationCount = byId("observation-count");
   if (observationCount) observationCount.textContent = String(state.observationPosts?.length || 0);
+
+  const todaysObservationCount = (state.observationPosts || []).filter((post) => post.date === localDateKey()).length;
+  const observationStatus = byId("home-observation-status");
+  if (observationStatus) {
+    observationStatus.textContent = todaysObservationCount
+      ? `今日新增案件 ${todaysObservationCount}`
+      : "今日暂无新案件";
+  }
+
+  const latestDiary = [...state.jiangyuDiaries].sort((left, right) => {
+    const dateOrder = String(right.date || "").localeCompare(String(left.date || ""));
+    if (dateOrder) return dateOrder;
+    return String(right.createdAt || "").localeCompare(String(left.createdAt || ""));
+  })[0];
+
+  const diaryTitle = byId("home-diary-title");
+  const diaryDate = byId("home-diary-date");
+  const diaryExcerpt = byId("home-diary-excerpt");
+  if (latestDiary) {
+    if (diaryTitle) diaryTitle.textContent = latestDiary.title || "阿屿的日记";
+    if (diaryDate) {
+      const date = new Date(`${latestDiary.date}T00:00:00`);
+      diaryDate.textContent = Number.isNaN(date.getTime())
+        ? latestDiary.date
+        : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
+    }
+    if (diaryExcerpt) {
+      const text = String(latestDiary.body || "").replace(/\s+/g, " ").trim();
+      diaryExcerpt.textContent = text ? (text.length > 92 ? `${text.slice(0, 92)}……` : text) : "这一页没有写很多，但我还是想把它留下来。";
+    }
+  } else {
+    if (diaryTitle) diaryTitle.textContent = "阿屿的日记";
+    if (diaryDate) diaryDate.textContent = "还没有日记";
+    if (diaryExcerpt) diaryExcerpt.textContent = "以后想留下来的话，就放在这里。";
+  }
+
   byId("backup-summary").textContent =
     `${state.letters.length} 封信 · ${state.jiangyuDiaries.length} 篇阿屿日记 · ${state.todayEntries.length} 篇小鱼记录 · ` +
     `${state.memories.length} 张纪念 · ${state.songs.length} 首歌 · ${(state.observationPosts || []).length} 条观察记录 · ` +
@@ -1119,6 +1210,51 @@ document.querySelectorAll("[data-go]").forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-home-tab]").forEach((button) => {
+  button.addEventListener("click", () => showHomeTab(button.dataset.homeTab));
+});
+
+const themeButton = byId("theme-button");
+const themePopover = byId("theme-popover");
+const themeClose = byId("theme-close");
+
+if (themeButton && themePopover) {
+  themeButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const nextHidden = !themePopover.hidden ? true : false;
+    themePopover.hidden = nextHidden;
+    themeButton.setAttribute("aria-expanded", nextHidden ? "false" : "true");
+  });
+
+  themePopover.addEventListener("click", (event) => event.stopPropagation());
+
+  document.addEventListener("click", () => {
+    if (!themePopover.hidden) {
+      themePopover.hidden = true;
+      themeButton.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+if (themeClose) {
+  themeClose.addEventListener("click", () => {
+    themePopover.hidden = true;
+    themeButton?.setAttribute("aria-expanded", "false");
+  });
+}
+
+document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+  button.addEventListener("click", () => {
+    applyTheme(button.dataset.themeChoice);
+    themePopover.hidden = true;
+    themeButton?.setAttribute("aria-expanded", "false");
+    showToast(`已经换成${button.querySelector("strong")?.textContent || "新"}主题。`);
+  });
+});
+
+applyTheme(loadTheme(), false);
+showHomeTab(activeHomeTab);
+
 byId("open-letter-editor").addEventListener("click", () => openLetterEditor());
 byId("close-letter-editor").addEventListener("click", closeLetterEditor);
 byId("open-letter-import").addEventListener("click", () => {
@@ -1847,7 +1983,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=14", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=15", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);

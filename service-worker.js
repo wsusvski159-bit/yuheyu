@@ -1,16 +1,16 @@
 "use strict";
 
 const CACHE_PREFIX = "our-timed-memories-";
-const CACHE_NAME = `${CACHE_PREFIX}shell-v10`;
+const CACHE_NAME = `${CACHE_PREFIX}shell-v11`;
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=14",
-  "./app.js?v=14",
-  "./diary.js?v=14",
-  "./sync.js?v=14",
-  "./observation.js?v=14",
-  "./shop.js?v=14",
+  "./style.css?v=15",
+  "./app.js?v=15",
+  "./diary.js?v=15",
+  "./sync.js?v=15",
+  "./observation.js?v=15",
+  "./shop.js?v=15",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
