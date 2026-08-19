@@ -1428,3 +1428,211 @@ noscript {
 .diary-card .card-body {
   white-space: pre-wrap;
 }
+
+/* ===== 阿屿的小金库 ===== */
+.treasury-panel,
+.shop-panel,
+.gift-cabinet,
+.shop-activity-panel {
+  margin-top: 22px;
+}
+
+.treasury-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.treasury-heading h2,
+.shop-panel h2,
+.gift-cabinet h2,
+.shop-activity-panel h2 {
+  margin: 8px 0 0;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-weight: 500;
+}
+
+.wallet-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 28px 0 6px;
+}
+
+.wallet-balance strong {
+  color: var(--accent-deep);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: clamp(3.4rem, 15vw, 5.8rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+}
+
+.wallet-balance span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.wallet-meta {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.wallet-meta b {
+  color: var(--accent-deep);
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.shop-item-card {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 124px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 254, 248, 0.62);
+}
+
+.shop-item-icon,
+.gift-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(151, 164, 128, 0.13);
+  border-radius: 16px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.15rem;
+  place-items: center;
+}
+
+.shop-item-card h3,
+.gift-card h3 {
+  margin: 1px 0 7px;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.shop-item-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.65;
+}
+
+.shop-item-card small {
+  color: var(--accent-deep);
+  font-size: 0.66rem;
+  font-weight: 650;
+}
+
+.gift-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.gift-card {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(151, 164, 128, 0.15);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 95% 10%, rgba(230, 235, 217, 0.52), transparent 10rem),
+    rgba(255, 254, 248, 0.72);
+}
+
+.gift-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  font-size: 1.35rem;
+}
+
+.gift-card small {
+  color: #9ca293;
+  font-size: 0.62rem;
+}
+
+.gift-note {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.shop-activity {
+  display: grid;
+  gap: 0;
+  margin-top: 18px;
+}
+
+.shop-activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 0.75rem;
+}
+
+.shop-activity-row:last-child {
+  border-bottom: 0;
+}
+
+.shop-activity-row small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.shop-activity-row.is-spend > span::before {
+  content: "− ";
+  color: #a59682;
+}
+
+.shop-activity-row.is-earn > span::before {
+  content: "+ ";
+  color: var(--accent-deep);
+}
+
+.shop-activity-row.is-gift > span::before {
+  content: "♡ ";
+  color: var(--accent-deep);
+}
+
+.compact-empty {
+  padding-block: 30px;
+}
+
+@media (max-width: 560px) {
+  .treasury-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .treasury-heading .secondary-button {
+    align-self: flex-start;
+  }
+
+  .shop-grid {
+    grid-template-columns: 1fr;
+  }
+}

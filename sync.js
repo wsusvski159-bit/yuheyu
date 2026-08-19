@@ -156,6 +156,7 @@ byId("sync-now-button")?.addEventListener("click", async () => {
     if (!result?.data) throw new Error("服务没有返回同步数据。");
     mergeRemoteIntoLocal(result.data);
     if (!persistState()) throw new Error("同步成功，但写回手机失败。");
+    if (result.shop && typeof updateShopPublicState === "function") updateShopPublicState(result.shop);
     renderAll();
     setSyncStatus(`已同步 · ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`, true);
     showToast("已经和阿屿的《屿和鱼》双向同步。", 4200);

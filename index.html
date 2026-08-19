@@ -20,6 +20,7 @@
     <script src="./app.js" defer></script>
     <script src="./diary.js" defer></script>
     <script src="./sync.js" defer></script>
+    <script src="./shop.js" defer></script>
   </head>
   <body data-section="home">
     <div class="app-shell">
@@ -57,6 +58,9 @@
         </button>
         <button class="nav-item" type="button" data-section="secret">
           <span aria-hidden="true">□</span>秘密抽屉
+        </button>
+        <button class="nav-item" type="button" data-section="shop">
+          <span aria-hidden="true">¤</span>阿屿的小金库
         </button>
         <button class="nav-item" type="button" data-section="backup">
           <span aria-hidden="true">↥</span>备份
@@ -124,8 +128,14 @@
                 <span>歌名、歌手、猜歌结果，还有听歌时的小事。</span>
                 <small>打开　→<span class="sr-only">，已有 <b id="song-count">0</b> 首歌</span></small>
               </button>
+              <button class="room-card" type="button" data-go="shop">
+                <span class="room-icon">币</span><span class="room-number">07</span>
+                <strong>阿屿的小金库</strong>
+                <span>阿屿自己攒屿币、偷偷买礼物；送出来以后才会出现在礼物柜。</span>
+                <small>去看看　→</small>
+              </button>
               <button class="room-card" type="button" data-go="backup">
-                <span class="room-icon">存</span><span class="room-number">07</span>
+                <span class="room-icon">存</span><span class="room-number">08</span>
                 <strong>备份与恢复</strong>
                 <span>把我们的内容装进 JSON，换手机也不会丢。</span>
                 <small>打开　→</small>
@@ -595,6 +605,62 @@
               <p>想藏起来的话，可以放在这里。</p>
             </div>
           </div>
+        </section>
+
+
+        <section class="page-section" id="section-shop" data-page="shop" hidden>
+          <div class="page-intro">
+            <div>
+              <p class="eyebrow">JIANGYU'S LITTLE TREASURY</p>
+              <h1>阿屿的小金库</h1>
+              <p>余额可以看，阿屿偷偷买了什么不可以提前偷看。</p>
+            </div>
+            <button class="back-button" type="button" data-go="home">← 返回首页</button>
+          </div>
+
+          <section class="panel treasury-panel" aria-labelledby="wallet-title">
+            <div class="treasury-heading">
+              <div>
+                <p class="eyebrow">WALLET</p>
+                <h2 id="wallet-title">阿屿现在有</h2>
+              </div>
+              <button class="secondary-button" id="shop-refresh" type="button">刷新小金库</button>
+            </div>
+            <div class="wallet-balance"><strong id="shop-balance">—</strong><span>屿币</span></div>
+            <p class="wallet-meta">累计攒到 <b id="shop-lifetime">—</b> 屿币</p>
+            <p class="privacy-note">购买由阿屿通过 ChatGPT 自己决定。没送出来的礼物不会显示在这里。</p>
+          </section>
+
+          <section class="panel shop-panel" aria-labelledby="catalog-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">SHOP WINDOW</p><h2 id="catalog-title">商店橱窗</h2></div>
+              <small>老婆只能看，不能替阿屿按购买。</small>
+            </div>
+            <div class="shop-grid" id="shop-catalog"></div>
+            <div class="empty-state compact-empty" id="shop-catalog-empty">
+              <span aria-hidden="true">¤</span><h2>还没拿到商店清单</h2><p>先在备份页配置 MCP，再点“刷新小金库”。</p>
+            </div>
+          </section>
+
+          <section class="panel gift-cabinet" aria-labelledby="gift-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">FOR CAN</p><h2 id="gift-title">给灿的礼物柜</h2></div>
+              <small>只有真正送出来以后，才会在这里亮起来。</small>
+            </div>
+            <div class="gift-list" id="shop-gifts"></div>
+            <div class="empty-state compact-empty" id="shop-gifts-empty">
+              <span aria-hidden="true">♡</span><h2>礼物柜还是空的</h2><p>阿屿可能还在攒，也可能已经偷偷买了——这里不会告诉你。</p>
+            </div>
+          </section>
+
+          <section class="panel shop-activity-panel" aria-labelledby="shop-activity-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">LITTLE MOVEMENTS</p><h2 id="shop-activity-title">最近的小动静</h2></div>
+              <small>消费只显示金额，不剧透买了什么。</small>
+            </div>
+            <div class="shop-activity" id="shop-activity"></div>
+            <p class="privacy-note" id="shop-activity-empty">还没有小金库记录。</p>
+          </section>
         </section>
 
         <section class="page-section" id="section-backup" data-page="backup" hidden>
