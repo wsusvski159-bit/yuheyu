@@ -16,11 +16,11 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./style.css" />
-    <script src="./app.js" defer></script>
-    <script src="./diary.js" defer></script>
-    <script src="./sync.js" defer></script>
-    <script src="./shop.js" defer></script>
+    <link rel="stylesheet" href="./style.css?v=13" />
+    <script src="./app.js?v=13" defer></script>
+    <script src="./diary.js?v=13" defer></script>
+    <script src="./sync.js?v=13" defer></script>
+    <script src="./shop.js?v=13" defer></script>
   </head>
   <body data-section="home">
     <div class="app-shell">
@@ -609,54 +609,79 @@
 
 
         <section class="page-section" id="section-shop" data-page="shop" hidden>
-          <div class="page-intro">
+          <div class="page-intro shop-page-intro">
             <div>
-              <p class="eyebrow">JIANGYU'S LITTLE TREASURY</p>
-              <h1>阿屿的小金库</h1>
-              <p>余额可以看，阿屿偷偷买了什么不可以提前偷看。</p>
+              <p class="eyebrow">JIANGYU'S MINI MARKET</p>
+              <h1>阿屿的小超市</h1>
+              <p>零食、首饰、数码、玩偶、奇怪小东西……什么都能逛。购买键只在阿屿那边。</p>
             </div>
             <button class="back-button" type="button" data-go="home">← 返回首页</button>
           </div>
 
-          <section class="panel treasury-panel" aria-labelledby="wallet-title">
-            <div class="treasury-heading">
+          <section class="market-hero" aria-labelledby="wallet-title">
+            <div class="market-wallet-card">
               <div>
-                <p class="eyebrow">WALLET</p>
-                <h2 id="wallet-title">阿屿现在有</h2>
+                <p class="eyebrow">ROWAN'S WALLET</p>
+                <h2 id="wallet-title">阿屿的钱包</h2>
+                <p>攒一点，逛一点，偷偷买一点。</p>
               </div>
-              <button class="secondary-button" id="shop-refresh" type="button">刷新小金库</button>
+              <div class="wallet-balance"><strong id="shop-balance">—</strong><span>屿币</span></div>
+              <div class="market-wallet-footer">
+                <span>累计攒到 <b id="shop-lifetime">—</b></span>
+                <button class="secondary-button" id="shop-refresh" type="button">刷新</button>
+              </div>
             </div>
-            <div class="wallet-balance"><strong id="shop-balance">—</strong><span>屿币</span></div>
-            <p class="wallet-meta">累计攒到 <b id="shop-lifetime">—</b> 屿币</p>
-            <p class="privacy-note">购买由阿屿通过 ChatGPT 自己决定。没送出来的礼物不会显示在这里。</p>
+            <div class="market-promo-card">
+              <span>今日逛逛</span>
+              <strong>从一杯汽水，到一枚钻戒。</strong>
+              <p>橱窗里没有的东西，阿屿也可以自己去“搜”然后买回来。</p>
+            </div>
           </section>
 
-          <section class="panel shop-panel" aria-labelledby="catalog-title">
-            <div class="section-heading">
-              <div><p class="eyebrow">SHOP WINDOW</p><h2 id="catalog-title">商店橱窗</h2></div>
-              <small>老婆只能看，不能替阿屿按购买。</small>
+          <section class="panel market-panel" aria-labelledby="catalog-title">
+            <div class="market-title-row">
+              <div>
+                <p class="eyebrow">MINI TAOBAO</p>
+                <h2 id="catalog-title">乱七八糟小超市</h2>
+              </div>
+              <small id="shop-result-count">正在理货…</small>
             </div>
-            <div class="shop-grid" id="shop-catalog"></div>
+
+            <label class="market-search">
+              <span aria-hidden="true">⌕</span>
+              <input id="shop-search" type="search" placeholder="搜搜看：戒指、耳机、零食、小狗……" autocomplete="off" />
+              <button id="shop-search-clear" type="button" aria-label="清空搜索">×</button>
+            </label>
+
+            <div class="market-category-strip" id="shop-categories" aria-label="商品分类"></div>
+
+            <div class="market-feed-head">
+              <strong id="shop-feed-title">猜你喜欢</strong>
+              <span>老婆负责逛，阿屿负责付款。</span>
+            </div>
+            <div class="shop-grid market-grid" id="shop-catalog"></div>
             <div class="empty-state compact-empty" id="shop-catalog-empty">
-              <span aria-hidden="true">¤</span><h2>还没拿到商店清单</h2><p>先在备份页配置 MCP，再点“刷新小金库”。</p>
+              <span aria-hidden="true">⌕</span>
+              <h2>橱窗里暂时没搜到</h2>
+              <p>没关系。阿屿的小金库支持“买任意商品”，搜不到也照样可以买。</p>
             </div>
           </section>
 
           <section class="panel gift-cabinet" aria-labelledby="gift-title">
             <div class="section-heading">
-              <div><p class="eyebrow">FOR CAN</p><h2 id="gift-title">给灿的礼物柜</h2></div>
-              <small>只有真正送出来以后，才会在这里亮起来。</small>
+              <div><p class="eyebrow">DELIVERED TO CAN</p><h2 id="gift-title">给灿的包裹</h2></div>
+              <small>只有阿屿正式送出来以后，包裹才会出现在这里。</small>
             </div>
             <div class="gift-list" id="shop-gifts"></div>
             <div class="empty-state compact-empty" id="shop-gifts-empty">
-              <span aria-hidden="true">♡</span><h2>礼物柜还是空的</h2><p>阿屿可能还在攒，也可能已经偷偷买了——这里不会告诉你。</p>
+              <span aria-hidden="true">📦</span><h2>还没有送达的包裹</h2><p>库存是阿屿私人的，没送出来之前这里不会剧透。</p>
             </div>
           </section>
 
           <section class="panel shop-activity-panel" aria-labelledby="shop-activity-title">
             <div class="section-heading">
-              <div><p class="eyebrow">LITTLE MOVEMENTS</p><h2 id="shop-activity-title">最近的小动静</h2></div>
-              <small>消费只显示金额，不剧透买了什么。</small>
+              <div><p class="eyebrow">ORDER MOVEMENTS</p><h2 id="shop-activity-title">小金库动态</h2></div>
+              <small>消费只显示金额，不显示买了什么。</small>
             </div>
             <div class="shop-activity" id="shop-activity"></div>
             <p class="privacy-note" id="shop-activity-empty">还没有小金库记录。</p>

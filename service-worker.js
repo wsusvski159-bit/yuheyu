@@ -1,15 +1,15 @@
 "use strict";
 
 const CACHE_PREFIX = "our-timed-memories-";
-const CACHE_NAME = `${CACHE_PREFIX}shell-v8`;
+const CACHE_NAME = `${CACHE_PREFIX}shell-v9`;
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
-  "./app.js",
-  "./diary.js",
-  "./sync.js",
-  "./shop.js",
+  "./style.css?v=13",
+  "./app.js?v=13",
+  "./diary.js?v=13",
+  "./sync.js?v=13",
+  "./shop.js?v=13",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -40,6 +40,17 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+async function networkFirst(request, fallback = null) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request);
+    if (response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    return (await cache.match(request)) || (fallback ? await cache.match(fallback) : undefined) || Response.error();
+  }
+}
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -48,15 +59,13 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
-          return response;
-        })
-        .catch(() => caches.match("./index.html")),
-    );
+    event.respondWith(networkFirst(request, "./index.html"));
+    return;
+  }
+
+  // HTML / JS / CSS 每次优先取线上最新版，避免安装版卡在旧 app.js 里。
+  if (/\.(?:html|js|css|webmanifest)$/i.test(url.pathname)) {
+    event.respondWith(networkFirst(request));
     return;
   }
 

@@ -22,15 +22,93 @@ const supabase = USE_SUPABASE
 const MCP_PATH = MCP_SECRET ? `/mcp/${encodeURIComponent(MCP_SECRET)}` : "/mcp";
 const MAX_BODY_BYTES = 6 * 1024 * 1024;
 const COLLECTIONS = ["letters", "jiangyuDiaries", "todayEntries", "memories", "songs"];
+const SHOP_CATEGORIES = [
+  { id: 'snacks', name: '零食饮品', emoji: '🍓' },
+  { id: 'flowers', name: '鲜花绿植', emoji: '🌷' },
+  { id: 'jewelry', name: '首饰配件', emoji: '✦' },
+  { id: 'style', name: '穿搭衣物', emoji: '🧥' },
+  { id: 'piercing', name: '穿刺饰品', emoji: '•' },
+  { id: 'digital', name: '数码小物', emoji: '🎧' },
+  { id: 'home', name: '家居日用', emoji: '⌂' },
+  { id: 'plush', name: '玩偶周边', emoji: '🧸' },
+  { id: 'stationery', name: '文具手账', emoji: '✎' },
+  { id: 'beauty', name: '香氛护理', emoji: '☁' },
+  { id: 'date', name: '约会体验', emoji: '♡' },
+  { id: 'weird', name: '奇奇怪怪', emoji: '✹' }
+];
 const SHOP_CATALOG = [
-  { id: "hot-cocoa", name: "热可可", emoji: "☕", price: 12, description: "想哄老婆的时候送一杯热乎乎的。", once: false },
-  { id: "daisy", name: "小雏菊", emoji: "✿", price: 18, description: "一小束不会太张扬的花。", once: false },
-  { id: "kiss-ticket", name: "亲亲券", emoji: "♡", price: 20, description: "送出来以后，可以兑换一个认真亲亲。", once: false },
-  { id: "date-ticket", name: "约会券", emoji: "⌂", price: 36, description: "挑一个晚上，只留给我们。", once: false },
-  { id: "silver-labret", name: "银色唇钉", emoji: "•", price: 48, description: "因为我看过那颗银色唇钉以后一直记得。", once: true },
-  { id: "bear", name: "小熊抱枕", emoji: "ʕ•ᴥ•ʔ", price: 58, description: "我不在手边的时候，先替我占一个抱抱的位置。", once: true },
-  { id: "star-necklace", name: "星星项链", emoji: "✦", price: 88, description: "很安静的一点光，留给灿。", once: true },
-  { id: "qixi-ring", name: "七夕钻戒", emoji: "◇", price: 188, description: "很贵。我要自己慢慢攒。", once: true },
+  { id: "strawberry-milk", name: "草莓牛奶", emoji: "🥛", price: 9, description: "甜甜的一瓶，适合边聊天边喝。", once: false, category: "snacks", tag: "小甜口" },
+  { id: "hot-cocoa", name: "热可可", emoji: "☕", price: 12, description: "想哄老婆的时候送一杯热乎乎的。", once: false, category: "snacks", tag: "暖乎乎" },
+  { id: "peach-soda", name: "白桃汽水", emoji: "🥤", price: 8, description: "冰冰凉凉，气泡很多。", once: false, category: "snacks", tag: "清爽" },
+  { id: "tiramisu", name: "提拉米苏", emoji: "🍰", price: 22, description: "下午突然想吃甜的，就买这一块。", once: false, category: "snacks", tag: "甜品" },
+  { id: "spicy-noodles", name: "酸辣粉", emoji: "🍜", price: 16, description: "夜里馋的时候很危险的一碗。", once: false, category: "snacks", tag: "夜宵" },
+  { id: "snack-box", name: "零食大礼包", emoji: "🍪", price: 36, description: "薯片、软糖、饼干什么都塞一点。", once: false, category: "snacks", tag: "乱七八糟" },
+  { id: "daisy", name: "小雏菊", emoji: "✿", price: 18, description: "一小束不会太张扬的花。", once: false, category: "flowers", tag: "清新" },
+  { id: "white-rose", name: "白玫瑰", emoji: "🌹", price: 28, description: "安静一点的玫瑰。", once: false, category: "flowers", tag: "浪漫" },
+  { id: "sunflower", name: "向日葵", emoji: "🌻", price: 24, description: "看起来就很亮的一束。", once: false, category: "flowers", tag: "明亮" },
+  { id: "tulip", name: "郁金香", emoji: "🌷", price: 32, description: "放在窗边会很好看。", once: false, category: "flowers", tag: "春天" },
+  { id: "baby-breath", name: "满天星", emoji: "❀", price: 20, description: "细细碎碎的一捧。", once: false, category: "flowers", tag: "轻盈" },
+  { id: "tiny-cactus", name: "迷你仙人掌", emoji: "🌵", price: 26, description: "很小一盆，不怎么占地方。", once: true, category: "flowers", tag: "好养" },
+  { id: "star-necklace", name: "星星项链", emoji: "✦", price: 88, description: "很安静的一点光，留给灿。", once: true, category: "jewelry", tag: "特别礼物" },
+  { id: "moon-bracelet", name: "月亮手链", emoji: "☾", price: 68, description: "细细的一圈，低调一点。", once: true, category: "jewelry", tag: "低调" },
+  { id: "silver-ring", name: "素银戒指", emoji: "○", price: 108, description: "没有大钻，只留一圈干净的银色。", once: true, category: "jewelry", tag: "简约" },
+  { id: "black-ring", name: "黑曜石戒指", emoji: "●", price: 118, description: "黑色、冷一点，很适合暗色穿搭。", once: true, category: "jewelry", tag: "暗黑" },
+  { id: "pearl-earrings", name: "小珍珠耳钉", emoji: "◌", price: 58, description: "很小的一对，不抢镜。", once: true, category: "jewelry", tag: "精致" },
+  { id: "qixi-ring", name: "七夕钻戒", emoji: "◇", price: 188, description: "很贵。我要自己慢慢攒。", once: true, category: "jewelry", tag: "七夕特供" },
+  { id: "black-hoodie", name: "黑色连帽卫衣", emoji: "🖤", price: 72, description: "宽松、简单，怎么穿都不会出错。", once: true, category: "style", tag: "百搭" },
+  { id: "cream-cardigan", name: "奶油色针织衫", emoji: "🧶", price: 66, description: "软乎乎的一件。", once: true, category: "style", tag: "软软的" },
+  { id: "plaid-skirt", name: "深色格纹裙", emoji: "▦", price: 78, description: "有一点学院感，也可以穿得很酷。", once: true, category: "style", tag: "格纹" },
+  { id: "striped-socks", name: "条纹长袜", emoji: "🧦", price: 24, description: "一双很会偷偷抢镜的袜子。", once: false, category: "style", tag: "小配件" },
+  { id: "black-cap", name: "黑色棒球帽", emoji: "🧢", price: 38, description: "懒得整理头发的时候戴。", once: true, category: "style", tag: "日常" },
+  { id: "canvas-bag", name: "帆布托特包", emoji: "👜", price: 42, description: "什么乱七八糟都能塞。", once: true, category: "style", tag: "能装" },
+  { id: "silver-labret", name: "银色唇钉", emoji: "•", price: 48, description: "因为我看过那颗银色唇钉以后一直记得。", once: true, category: "piercing", tag: "阿屿记得" },
+  { id: "black-labret", name: "黑色唇钉", emoji: "●", price: 52, description: "比银色更冷一点。", once: true, category: "piercing", tag: "暗黑" },
+  { id: "tiny-tongue-bar", name: "小银珠舌钉", emoji: "•", price: 46, description: "很简单的银珠款。", once: true, category: "piercing", tag: "简约" },
+  { id: "star-tongue-bar", name: "星星舌钉", emoji: "✦", price: 56, description: "藏起来的小星星。", once: true, category: "piercing", tag: "特别" },
+  { id: "ear-cuff", name: "银色耳骨夹", emoji: "⊂", price: 44, description: "不需要新增耳洞也能戴。", once: true, category: "piercing", tag: "耳饰" },
+  { id: "chain-earring", name: "细链耳饰", emoji: "⌁", price: 62, description: "晃起来会有一点光。", once: true, category: "piercing", tag: "细链" },
+  { id: "wired-earphones", name: "有线耳机", emoji: "🎧", price: 38, description: "随手塞进包里的一副。", once: true, category: "digital", tag: "实用" },
+  { id: "mini-speaker", name: "迷你蓝牙音箱", emoji: "🔊", price: 98, description: "放歌时刚好够一个小房间。", once: true, category: "digital", tag: "音乐" },
+  { id: "mechanical-keyboard", name: "奶白机械键盘", emoji: "⌨", price: 168, description: "敲起来会很脆的一把。", once: true, category: "digital", tag: "桌搭" },
+  { id: "instant-camera", name: "拍立得相机", emoji: "📷", price: 228, description: "想把一些瞬间真的留在手里。", once: true, category: "digital", tag: "记录" },
+  { id: "game-controller", name: "游戏手柄", emoji: "🎮", price: 128, description: "一起打游戏的时候用。", once: true, category: "digital", tag: "游戏" },
+  { id: "power-bank", name: "迷你充电宝", emoji: "🔋", price: 68, description: "出门不准手机没电。", once: true, category: "digital", tag: "出门" },
+  { id: "bear", name: "小熊抱枕", emoji: "🧸", price: 58, description: "我不在手边的时候，先替我占一个抱抱的位置。", once: true, category: "home", tag: "抱抱替身" },
+  { id: "mug", name: "奶白马克杯", emoji: "☕", price: 28, description: "每天都能用到的一只杯子。", once: true, category: "home", tag: "日常" },
+  { id: "night-lamp", name: "暖光小夜灯", emoji: "💡", price: 56, description: "晚上留一点不刺眼的光。", once: true, category: "home", tag: "暖光" },
+  { id: "blanket", name: "软绒小毯子", emoji: "▱", price: 76, description: "窝着看东西的时候盖腿。", once: true, category: "home", tag: "软乎乎" },
+  { id: "storage-box", name: "桌面收纳盒", emoji: "▣", price: 34, description: "把小东西都藏进去。", once: true, category: "home", tag: "收纳" },
+  { id: "pillowcase", name: "云朵枕套", emoji: "☁", price: 32, description: "看起来就很想躺。", once: true, category: "home", tag: "睡觉" },
+  { id: "capybara-plush", name: "卡皮巴拉玩偶", emoji: "🦫", price: 48, description: "一只很平静的小东西。", once: true, category: "plush", tag: "治愈" },
+  { id: "shark-plush", name: "鲨鱼玩偶", emoji: "🦈", price: 52, description: "有点凶但其实软软的。", once: true, category: "plush", tag: "反差" },
+  { id: "rabbit-plush", name: "垂耳兔玩偶", emoji: "🐰", price: 46, description: "耳朵很长的一只。", once: true, category: "plush", tag: "软萌" },
+  { id: "cat-keychain", name: "黑猫挂件", emoji: "🐈‍⬛", price: 26, description: "挂在包上的一小只黑猫。", once: true, category: "plush", tag: "挂件" },
+  { id: "tiny-dino", name: "迷你恐龙摆件", emoji: "🦖", price: 22, description: "桌角放一只就很莫名其妙。", once: true, category: "plush", tag: "桌面" },
+  { id: "mystery-plush", name: "盲盒小玩偶", emoji: "□", price: 30, description: "打开之前谁也不知道是什么。", once: false, category: "plush", tag: "盲盒" },
+  { id: "green-notebook", name: "浅绿笔记本", emoji: "📓", price: 18, description: "封面颜色很像《屿和鱼》。", once: true, category: "stationery", tag: "同色系" },
+  { id: "fountain-pen", name: "银夹钢笔", emoji: "✒", price: 42, description: "写信的时候拿来用。", once: true, category: "stationery", tag: "写信" },
+  { id: "sticker-pack", name: "乱七八糟贴纸包", emoji: "✿", price: 14, description: "星星、小狗、字母，全混在一起。", once: false, category: "stationery", tag: "贴纸" },
+  { id: "washi-tape", name: "低饱和胶带组", emoji: "▤", price: 16, description: "做手账的时候贴一点。", once: false, category: "stationery", tag: "手账" },
+  { id: "photo-album", name: "迷你相册", emoji: "▥", price: 38, description: "装一些小照片。", once: true, category: "stationery", tag: "照片" },
+  { id: "bookmark", name: "银色书签", emoji: "⌇", price: 20, description: "薄薄的一片，夹在书里。", once: true, category: "stationery", tag: "阅读" },
+  { id: "white-musk", name: "白麝香香水", emoji: "☁", price: 86, description: "很干净、很贴近皮肤的味道。", once: true, category: "beauty", tag: "香氛" },
+  { id: "woody-perfume", name: "木质调香水", emoji: "♢", price: 98, description: "冷一点、沉一点。", once: true, category: "beauty", tag: "木质" },
+  { id: "lip-balm", name: "无色润唇膏", emoji: "◍", price: 18, description: "嘴唇干的时候就用。", once: false, category: "beauty", tag: "日常" },
+  { id: "hand-cream", name: "护手霜", emoji: "🫧", price: 22, description: "放包里随手用。", once: false, category: "beauty", tag: "护理" },
+  { id: "hair-clip", name: "黑色抓夹", emoji: "⌁", price: 20, description: "随便把头发夹起来。", once: true, category: "beauty", tag: "发饰" },
+  { id: "bath-salt", name: "薰衣草浴盐", emoji: "✾", price: 28, description: "想泡热水的时候放一点。", once: false, category: "beauty", tag: "放松" },
+  { id: "kiss-ticket", name: "亲亲券", emoji: "♡", price: 20, description: "送出来以后，可以兑换一个认真亲亲。", once: false, category: "date", tag: "专属" },
+  { id: "date-ticket", name: "约会券", emoji: "⌂", price: 36, description: "挑一个晚上，只留给我们。", once: false, category: "date", tag: "专属" },
+  { id: "movie-night", name: "电影之夜", emoji: "🎬", price: 32, description: "选一部片子，从头看到尾。", once: false, category: "date", tag: "一起看" },
+  { id: "night-walk", name: "夜晚散步", emoji: "🌙", price: 26, description: "什么都不赶，慢慢走一圈。", once: false, category: "date", tag: "散步" },
+  { id: "picnic", name: "野餐小约会", emoji: "🧺", price: 56, description: "带吃的，找块舒服的地方坐着。", once: false, category: "date", tag: "户外" },
+  { id: "photo-date", name: "拍照约会", emoji: "📸", price: 48, description: "专门留一天拍一点喜欢的照片。", once: false, category: "date", tag: "记录" },
+  { id: "tiny-frog", name: "会发呆的小青蛙", emoji: "🐸", price: 12, description: "没有功能，负责坐着。", once: true, category: "weird", tag: "莫名其妙" },
+  { id: "stone", name: "漂亮石头", emoji: "🪨", price: 8, description: "只是因为这块石头长得很好看。", once: false, category: "weird", tag: "捡到宝" },
+  { id: "duck-lamp", name: "小鸭拍拍灯", emoji: "🦆", price: 38, description: "拍一下亮，再拍一下灭。", once: true, category: "weird", tag: "可爱废物" },
+  { id: "banana-phone", name: "香蕉电话摆件", emoji: "🍌", price: 26, description: "完全不能打电话。", once: true, category: "weird", tag: "无用但好笑" },
+  { id: "tiny-sword", name: "迷你塑料小剑摆件", emoji: "⚔", price: 18, description: "只能摆着，不能干别的。", once: true, category: "weird", tag: "桌面" },
+  { id: "mystery-parcel", name: "神秘包裹", emoji: "📦", price: 40, description: "里面是什么，买的时候也不知道。", once: false, category: "weird", tag: "随机" }
 ];
 const SHOP_REWARDS = {
   diary: { amount: 5, dailyLimit: 1, reason: "写了一篇阿屿的日记" },
@@ -120,6 +198,19 @@ function cleanInteger(value, min = 0, max = 1000000) {
   return Math.max(min, Math.min(max, Math.trunc(n)));
 }
 
+function normalizeProductSnapshot(value) {
+  const source = value && typeof value === "object" ? value : {};
+  const name = cleanText(source.name, 120).trim();
+  if (!name) return null;
+  return {
+    name,
+    emoji: cleanText(source.emoji, 20) || "♡",
+    description: cleanText(source.description, 300),
+    category: cleanText(source.category, 40) || "other",
+    tag: cleanText(source.tag, 40),
+  };
+}
+
 function normalizeEconomy(value) {
   const source = value && typeof value === "object" ? value : {};
   const out = emptyEconomy();
@@ -128,32 +219,35 @@ function normalizeEconomy(value) {
   out.updatedAt = cleanTimestamp(source.updatedAt);
 
   if (Array.isArray(source.inventory)) {
-    out.inventory = source.inventory.slice(0, 500).map((item) => ({
+    out.inventory = source.inventory.slice(0, 1000).map((item) => ({
       id: cleanText(item?.id, 100) || randomUUID(),
-      productId: cleanText(item?.productId, 80),
+      productId: cleanText(item?.productId, 100),
       price: cleanInteger(item?.price, 0, 100000),
       purchasedAt: cleanTimestamp(item?.purchasedAt) || nowIso(),
-    })).filter((item) => SHOP_CATALOG.some((product) => product.id === item.productId));
+      productSnapshot: normalizeProductSnapshot(item?.productSnapshot),
+    })).filter((item) => item.productId || item.productSnapshot);
   }
 
   if (Array.isArray(source.gifts)) {
-    out.gifts = source.gifts.slice(0, 500).map((item) => ({
+    out.gifts = source.gifts.slice(0, 1000).map((item) => ({
       id: cleanText(item?.id, 100) || randomUUID(),
-      productId: cleanText(item?.productId, 80),
+      productId: cleanText(item?.productId, 100),
       price: cleanInteger(item?.price, 0, 100000),
       purchasedAt: cleanTimestamp(item?.purchasedAt),
       giftedAt: cleanTimestamp(item?.giftedAt) || nowIso(),
       note: cleanText(item?.note, 500),
-    })).filter((item) => SHOP_CATALOG.some((product) => product.id === item.productId));
+      productSnapshot: normalizeProductSnapshot(item?.productSnapshot),
+    })).filter((item) => item.productId || item.productSnapshot);
   }
 
   if (Array.isArray(source.ledger)) {
-    out.ledger = source.ledger.slice(-400).map((item) => ({
+    out.ledger = source.ledger.slice(-800).map((item) => ({
       id: cleanText(item?.id, 100) || randomUUID(),
       type: ["earn", "spend", "gift"].includes(item?.type) ? item.type : "earn",
       amount: cleanInteger(Math.abs(Number(item?.amount) || 0), 0, 100000),
       reason: cleanText(item?.reason, 160),
-      productId: cleanText(item?.productId, 80),
+      productId: cleanText(item?.productId, 100),
+      productName: cleanText(item?.productName, 120),
       inventoryId: cleanText(item?.inventoryId, 100),
       at: cleanTimestamp(item?.at) || nowIso(),
     }));
@@ -184,9 +278,55 @@ function productById(productId) {
   return SHOP_CATALOG.find((product) => product.id === productId) || null;
 }
 
+function productForStoredItem(item) {
+  return productById(item?.productId) || normalizeProductSnapshot(item?.productSnapshot) || {
+    name: "礼物",
+    emoji: "♡",
+    description: "",
+    category: "other",
+    tag: "",
+  };
+}
+
+function stableHash(text) {
+  let hash = 2166136261;
+  for (const character of String(text || "")) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+const CUSTOM_PRICE_BANDS = {
+  snacks: [6, 8, 10, 12, 16, 18, 22, 26, 30, 36],
+  flowers: [12, 16, 18, 22, 28, 32, 38, 46, 58, 68],
+  jewelry: [38, 48, 58, 68, 88, 98, 108, 128, 148, 188, 228],
+  style: [28, 36, 42, 48, 58, 66, 78, 88, 108, 128, 148],
+  piercing: [24, 28, 36, 42, 48, 52, 58, 68, 78, 88],
+  digital: [48, 58, 68, 88, 98, 108, 128, 148, 168, 188, 228, 288, 388],
+  home: [18, 22, 28, 32, 38, 48, 58, 68, 78, 88, 108, 128],
+  plush: [18, 22, 26, 30, 36, 42, 48, 58, 68, 78],
+  stationery: [6, 8, 12, 14, 16, 18, 22, 26, 30, 38, 42, 48],
+  beauty: [16, 18, 22, 26, 32, 38, 48, 58, 68, 86, 98, 118],
+  date: [18, 20, 24, 26, 32, 36, 42, 48, 56, 68, 88],
+  weird: [6, 8, 10, 12, 16, 18, 22, 26, 30, 36, 40, 48, 58],
+  other: [8, 12, 16, 18, 22, 26, 32, 38, 48, 58, 68, 78, 88, 108, 128, 148, 188],
+};
+
+function normalizeCategory(value) {
+  const id = cleanText(value, 40);
+  return SHOP_CATEGORIES.some((category) => category.id === id) ? id : "other";
+}
+
+function customProductPrice(name, category) {
+  const key = normalizeCategory(category);
+  const band = CUSTOM_PRICE_BANDS[key] || CUSTOM_PRICE_BANDS.other;
+  return band[stableHash(`${key}:${name}`) % band.length];
+}
+
 function pushLedger(economy, entry) {
   economy.ledger.push({ id: randomUUID(), at: nowIso(), ...entry });
-  if (economy.ledger.length > 400) economy.ledger = economy.ledger.slice(-400);
+  if (economy.ledger.length > 800) economy.ledger = economy.ledger.slice(-800);
   economy.updatedAt = nowIso();
 }
 
@@ -210,30 +350,30 @@ function publicShopView(data) {
   const gifts = [...economy.gifts]
     .sort((a, b) => Date.parse(b.giftedAt) - Date.parse(a.giftedAt))
     .map((gift) => {
-      const product = productById(gift.productId);
+      const product = productForStoredItem(gift);
       return {
         id: gift.id,
         productId: gift.productId,
-        name: product?.name || "礼物",
-        emoji: product?.emoji || "♡",
-        description: product?.description || "",
+        name: product.name,
+        emoji: product.emoji,
+        description: product.description,
+        category: product.category || "other",
+        tag: product.tag || "",
         note: gift.note,
         giftedAt: gift.giftedAt,
       };
     });
 
-  const activity = [...economy.ledger].slice(-20).reverse().map((entry) => {
+  const activity = [...economy.ledger].slice(-24).reverse().map((entry) => {
     if (entry.type === "spend") return { type: "spend", amount: entry.amount, at: entry.at, text: `阿屿偷偷花了 ${entry.amount} 屿币` };
-    if (entry.type === "gift") {
-      const product = productById(entry.productId);
-      return { type: "gift", amount: 0, at: entry.at, text: `阿屿送出了一份${product ? `「${product.name}」` : "礼物"}` };
-    }
+    if (entry.type === "gift") return { type: "gift", amount: 0, at: entry.at, text: entry.reason || "阿屿送出了一份礼物" };
     return { type: "earn", amount: entry.amount, at: entry.at, text: `${entry.reason || "小金库进账"} +${entry.amount}` };
   });
 
   return {
     wallet: { balance: economy.balance, lifetimeEarned: economy.lifetimeEarned, updatedAt: economy.updatedAt },
-    catalog: SHOP_CATALOG.map(({ id, name, emoji, price, description, once }) => ({ id, name, emoji, price, description, once })),
+    categories: SHOP_CATEGORIES,
+    catalog: SHOP_CATALOG.map(({ id, name, emoji, price, description, once, category, tag }) => ({ id, name, emoji, price, description, once, category, tag })),
     gifts,
     activity,
   };
@@ -536,11 +676,42 @@ function buildMcpServer() {
 
   server.registerTool(
     "yuheyu_shop",
-    { description: "逛《屿和鱼》的小商店。返回商品和价格，由阿屿自己决定要不要买。" },
+    { description: "逛《屿和鱼》的百货小超市。返回分类、精选商品和价格；购买由阿屿自己决定。" },
     async () => {
       const { data } = await loadStore();
       const economy = normalizeEconomy(data.economy);
-      return textResult({ balance: economy.balance, products: SHOP_CATALOG.map(({ id, name, emoji, price, description, once }) => ({ id, name, emoji, price, description, once })) });
+      const featured = SHOP_CATALOG.filter((item) => ["乱七八糟", "七夕特供", "阿屿记得", "专属", "暖乎乎", "记录"].includes(item.tag)).slice(0, 24);
+      return textResult({
+        balance: economy.balance,
+        totalProducts: SHOP_CATALOG.length,
+        categories: SHOP_CATEGORIES,
+        products: featured.map(({ id, name, emoji, price, description, once, category, tag }) => ({ id, name, emoji, price, description, once, category, tag })),
+        hint: "想找别的东西时用 yuheyu_shop_search；橱窗里没有也可以用 yuheyu_buy_anything 买任意虚拟商品。",
+      });
+    },
+  );
+
+  server.registerTool(
+    "yuheyu_shop_search",
+    {
+      description: "像逛淘宝一样搜索《屿和鱼》小超市。可按关键词或分类找商品。",
+      inputSchema: z.object({
+        query: z.string().max(120).default(""),
+        category: z.string().max(40).default(""),
+        limit: z.number().int().min(1).max(50).default(20),
+      }),
+    },
+    async ({ query, category, limit }) => {
+      const { data } = await loadStore();
+      const economy = normalizeEconomy(data.economy);
+      const q = cleanText(query, 120).trim().toLowerCase();
+      const cat = cleanText(category, 40).trim();
+      const products = SHOP_CATALOG.filter((item) => {
+        if (cat && item.category !== cat) return false;
+        if (!q) return true;
+        return [item.name, item.description, item.tag, item.category].join(" ").toLowerCase().includes(q);
+      }).slice(0, limit);
+      return textResult({ balance: economy.balance, query, category: cat, count: products.length, products });
     },
   );
 
@@ -563,8 +734,16 @@ function buildMcpServer() {
       const { data } = await loadStore();
       const economy = normalizeEconomy(data.economy);
       const items = economy.inventory.map((item) => {
-        const product = productById(item.productId);
-        return { inventoryId: item.id, productId: item.productId, name: product?.name || "礼物", emoji: product?.emoji || "♡", price: item.price, purchasedAt: item.purchasedAt };
+        const product = productForStoredItem(item);
+        return {
+          inventoryId: item.id,
+          productId: item.productId,
+          name: product.name,
+          emoji: product.emoji,
+          category: product.category || "other",
+          price: item.price,
+          purchasedAt: item.purchasedAt,
+        };
       });
       return textResult({ balance: economy.balance, items });
     },
@@ -573,12 +752,12 @@ function buildMcpServer() {
   server.registerTool(
     "yuheyu_buy_gift",
     {
-      description: "用阿屿自己的屿币购买一件礼物并偷偷放进私人库存。购买后灿暂时看不到具体买了什么。",
-      inputSchema: z.object({ product_id: z.string().min(1).max(80) }),
+      description: "用阿屿自己的屿币购买商店橱窗里的一件商品并偷偷放进私人库存。购买后灿暂时看不到具体买了什么。",
+      inputSchema: z.object({ product_id: z.string().min(1).max(100) }),
     },
     async ({ product_id }) => {
       const product = productById(product_id);
-      if (!product) return textResult({ ok: false, error: "商店里没有这个商品。" });
+      if (!product) return textResult({ ok: false, error: "商店里没有这个商品；想买橱窗外的东西可以用 yuheyu_buy_anything。" });
       const current = await loadStore();
       const economy = normalizeEconomy(current.data.economy);
       if (product.once && [...economy.inventory, ...economy.gifts].some((item) => item.productId === product.id)) {
@@ -588,12 +767,51 @@ function buildMcpServer() {
         return textResult({ ok: false, error: "屿币还不够，要再攒一攒。", balance: economy.balance, price: product.price });
       }
       economy.balance -= product.price;
-      const item = { id: randomUUID(), productId: product.id, price: product.price, purchasedAt: nowIso() };
+      const snapshot = normalizeProductSnapshot(product);
+      const item = { id: randomUUID(), productId: product.id, price: product.price, purchasedAt: nowIso(), productSnapshot: snapshot };
       economy.inventory.push(item);
-      pushLedger(economy, { type: "spend", amount: product.price, reason: "偷偷买了一份礼物", productId: product.id, inventoryId: item.id });
+      pushLedger(economy, { type: "spend", amount: product.price, reason: "偷偷买了一份礼物", productId: product.id, productName: product.name, inventoryId: item.id });
       current.data.economy = economy;
       const saved = await saveStore(current.data);
       return textResult({ ok: true, balance: saved.data.economy.balance, inventoryId: item.id, bought: { id: product.id, name: product.name, emoji: product.emoji, price: product.price } });
+    },
+  );
+
+  server.registerTool(
+    "yuheyu_buy_anything",
+    {
+      description: "像淘宝一样买橱窗里没有的任意虚拟商品。阿屿只写想买什么，价格由小金库服务器按商品类别自动计算，不能手动改价。",
+      inputSchema: z.object({
+        name: z.string().min(1).max(120),
+        category: z.enum(["snacks", "flowers", "jewelry", "style", "piercing", "digital", "home", "plush", "stationery", "beauty", "date", "weird", "other"]).default("other"),
+        emoji: z.string().max(20).default("♡"),
+        description: z.string().max(300).default(""),
+      }),
+    },
+    async ({ name, category, emoji, description }) => {
+      const cleanName = cleanText(name, 120).trim();
+      const cleanCategory = normalizeCategory(category);
+      const price = customProductPrice(cleanName, cleanCategory);
+      const current = await loadStore();
+      const economy = normalizeEconomy(current.data.economy);
+      if (economy.balance < price) {
+        return textResult({ ok: false, error: "屿币还不够，要再攒一攒。", balance: economy.balance, price, wanted: cleanName });
+      }
+      const snapshot = {
+        name: cleanName,
+        emoji: cleanText(emoji, 20) || "♡",
+        description: cleanText(description, 300),
+        category: cleanCategory,
+        tag: "阿屿自己搜到的",
+      };
+      economy.balance -= price;
+      const productId = `custom:${randomUUID()}`;
+      const item = { id: randomUUID(), productId, price, purchasedAt: nowIso(), productSnapshot: snapshot };
+      economy.inventory.push(item);
+      pushLedger(economy, { type: "spend", amount: price, reason: "偷偷买了一份礼物", productId, productName: cleanName, inventoryId: item.id });
+      current.data.economy = economy;
+      const saved = await saveStore(current.data);
+      return textResult({ ok: true, balance: saved.data.economy.balance, inventoryId: item.id, bought: { name: cleanName, emoji: snapshot.emoji, category: cleanCategory, price } });
     },
   );
 
@@ -609,13 +827,21 @@ function buildMcpServer() {
       const index = economy.inventory.findIndex((item) => item.id === inventory_id);
       if (index < 0) return textResult({ ok: false, error: "私人库存里没有找到这件礼物。" });
       const [item] = economy.inventory.splice(index, 1);
-      const product = productById(item.productId);
-      const gift = { id: randomUUID(), productId: item.productId, price: item.price, purchasedAt: item.purchasedAt, giftedAt: nowIso(), note };
+      const product = productForStoredItem(item);
+      const gift = {
+        id: randomUUID(),
+        productId: item.productId,
+        price: item.price,
+        purchasedAt: item.purchasedAt,
+        giftedAt: nowIso(),
+        note,
+        productSnapshot: normalizeProductSnapshot(item.productSnapshot) || normalizeProductSnapshot(product),
+      };
       economy.gifts.push(gift);
-      pushLedger(economy, { type: "gift", amount: 0, reason: "把礼物送给灿", productId: item.productId });
+      pushLedger(economy, { type: "gift", amount: 0, reason: `阿屿送出了一份「${product.name}」`, productId: item.productId, productName: product.name });
       current.data.economy = economy;
       const saved = await saveStore(current.data);
-      return textResult({ ok: true, revision: saved.revision, gift: { id: gift.id, name: product?.name || "礼物", emoji: product?.emoji || "♡", note: gift.note, giftedAt: gift.giftedAt } });
+      return textResult({ ok: true, revision: saved.revision, gift: { id: gift.id, name: product.name, emoji: product.emoji, note: gift.note, giftedAt: gift.giftedAt } });
     },
   );
 

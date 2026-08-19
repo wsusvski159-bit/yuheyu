@@ -9,7 +9,7 @@ const LETTER_CODE_PREFIX = "YUHEYU_LETTER_V1:";
 const MEMORY_CODE_PREFIX = "YUHEYU_MEMORY_V1:";
 const RELATIONSHIP_START = "2026-07-23";
 const CHATGPT_URL = "https://chatgpt.com/";
-const sectionNames = new Set(["home", "letters", "diaries", "today", "memories", "songs", "secret", "shop", "backup"]);
+const sectionNames = new Set([...document.querySelectorAll("[data-page]")].map((section) => section.dataset.page).filter(Boolean));
 const songResults = new Set(["还没猜", "猜中了", "没猜中", "一起听过"]);
 const moodOptions = new Set(["开心", "平静", "想你", "害羞", "委屈", "疲惫"]);
 
@@ -1806,10 +1806,19 @@ if (incomingLetter) {
   showSection(sectionNames.has(initialSection) ? initialSection : "home", false);
 }
 
+window.addEventListener("hashchange", () => {
+  if (location.hash.startsWith("#letter=")) return;
+  const target = location.hash.slice(1);
+  showSection(sectionNames.has(target) ? target : "home", false);
+});
+
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=13", { updateViaCache: "none" });
+      registration.update().catch(() => {});
+    } catch (error) {
       console.error("离线服务注册失败", error);
-    });
+    }
   });
 }
