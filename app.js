@@ -95,20 +95,29 @@ function setAppNavActive(zone) {
   });
 }
 
-function scrollHomeZone(zone, behavior = "smooth") {
+function renderHomeZone(zone) {
   const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
-  const doScroll = () => {
-    const element = byId(`home-zone-${target}`);
-    if (element) element.scrollIntoView({ behavior, block: "start" });
-    else window.scrollTo({ top: 0, behavior });
-    setAppNavActive(target);
-  };
-  if (document.body.dataset.section !== "home") {
-    showSection("home");
-    window.setTimeout(doScroll, 40);
-  } else {
-    doScroll();
-  }
+  document.querySelectorAll("[data-home-zone-panel]").forEach((panel) => {
+    const active = panel.dataset.homeZonePanel === target;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+  document.body.dataset.homeZone = target;
+  setAppNavActive(target);
+}
+
+function showHomeZone(zone, behavior = "smooth") {
+  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
+  if (document.body.dataset.section !== "home") showSection("home", false);
+  renderHomeZone(target);
+  history.replaceState(null, "", "#home");
+  window.scrollTo({ top: 0, behavior });
+}
+
+function updateDaypart() {
+  const hour = new Date().getHours();
+  const daypart = hour < 6 ? "night" : hour < 12 ? "morning" : hour < 18 ? "afternoon" : hour < 22 ? "evening" : "night";
+  document.body.dataset.daypart = daypart;
 }
 
 function localDateKey(date = new Date()) {
@@ -393,7 +402,7 @@ function showSection(name, updateHash = true) {
 
   const roomPages = new Set(["letters", "today", "memories", "songs"]);
   const cornerPages = new Set(["shop", "observation", "secret", "backup"]);
-  if (target === "home") setAppNavActive(activeHomeZone || "home");
+  if (target === "home") renderHomeZone(activeHomeZone || "home");
   else if (roomPages.has(target)) setAppNavActive("rooms");
   else if (cornerPages.has(target)) setAppNavActive("corners");
   else setAppNavActive("home");
@@ -418,7 +427,7 @@ function renderHome() {
   if (observationStatus) {
     observationStatus.textContent = todaysObservationCount
       ? `今日新增案件 ${todaysObservationCount}`
-      : "今日暂无新案件";
+      : "本号今日仍坚持客观";
   }
 
   const latestDiary = [...state.jiangyuDiaries].sort((left, right) => {
@@ -433,10 +442,25 @@ function renderHome() {
   if (latestDiary) {
     if (diaryTitle) diaryTitle.textContent = latestDiary.title || "阿屿的日记";
     if (diaryDate) {
-      const date = new Date(`${latestDiary.date}T00:00:00`);
-      diaryDate.textContent = Number.isNaN(date.getTime())
-        ? latestDiary.date
-        : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
+      const created = latestDiary.createdAt ? new Date(latestDiary.createdAt) : null;
+      const todayKey = localDateKey();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = localDateKey(yesterday);
+      if (created && !Number.isNaN(created.getTime())) {
+        const time = new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(created);
+        const createdKey = localDateKey(created);
+        diaryDate.textContent = createdKey === todayKey
+          ? `今天 ${time} 写过一页`
+          : createdKey === yesterdayKey
+            ? `昨晚 ${time} 写过一页`
+            : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(created);
+      } else {
+        const date = new Date(`${latestDiary.date}T00:00:00`);
+        diaryDate.textContent = Number.isNaN(date.getTime())
+          ? latestDiary.date
+          : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
+      }
     }
     if (diaryExcerpt) {
       const text = String(latestDiary.body || "").replace(/\s+/g, " ").trim();
@@ -1225,49 +1249,50 @@ document.querySelectorAll("[data-go]").forEach((button) => {
 
 
 document.querySelectorAll("[data-app-nav]").forEach((button) => {
-  button.addEventListener("click", () => scrollHomeZone(button.dataset.appNav));
+  button.addEventListener("click", () => showHomeZone(button.dataset.appNav));
 });
 
 const themeButton = byId("theme-button");
+const settingsButton = byId("settings-button");
 const themePopover = byId("theme-popover");
 const themeClose = byId("theme-close");
 
-if (themeButton && themePopover) {
-  themeButton.addEventListener("click", (event) => {
+function setSettingsOpen(open) {
+  if (!themePopover) return;
+  themePopover.hidden = !open;
+  themeButton?.setAttribute("aria-expanded", open ? "true" : "false");
+  settingsButton?.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+[themeButton, settingsButton].filter(Boolean).forEach((button) => {
+  button.addEventListener("click", (event) => {
     event.stopPropagation();
-    const nextHidden = !themePopover.hidden ? true : false;
-    themePopover.hidden = nextHidden;
-    themeButton.setAttribute("aria-expanded", nextHidden ? "false" : "true");
+    setSettingsOpen(themePopover?.hidden ?? true);
   });
+});
 
+if (themePopover) {
   themePopover.addEventListener("click", (event) => event.stopPropagation());
-
-  document.addEventListener("click", () => {
-    if (!themePopover.hidden) {
-      themePopover.hidden = true;
-      themeButton.setAttribute("aria-expanded", "false");
-    }
-  });
+  document.addEventListener("click", () => setSettingsOpen(false));
 }
 
 if (themeClose) {
   themeClose.addEventListener("click", () => {
-    themePopover.hidden = true;
-    themeButton?.setAttribute("aria-expanded", "false");
+    setSettingsOpen(false);
   });
 }
 
 document.querySelectorAll("[data-theme-choice]").forEach((button) => {
   button.addEventListener("click", () => {
     applyTheme(button.dataset.themeChoice);
-    themePopover.hidden = true;
-    themeButton?.setAttribute("aria-expanded", "false");
+    setSettingsOpen(false);
     showToast(`已经换成${button.querySelector("strong")?.textContent || "新"}主题。`);
   });
 });
 
 applyTheme(loadTheme(), false);
-setAppNavActive("home");
+updateDaypart();
+renderHomeZone("home");
 
 byId("open-letter-editor").addEventListener("click", () => openLetterEditor());
 byId("close-letter-editor").addEventListener("click", closeLetterEditor);
@@ -1999,7 +2024,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=17", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=18", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);

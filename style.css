@@ -3980,3 +3980,352 @@ body {
     height: 66px;
   }
 }
+
+
+
+/* ===== v1.8 · 一页一页的小岛 ===== */
+:root {
+  --time-wash: rgba(244, 238, 205, .12);
+}
+
+body[data-daypart="morning"] { --time-wash: rgba(255, 248, 219, .16); }
+body[data-daypart="afternoon"] { --time-wash: rgba(244, 229, 190, .15); }
+body[data-daypart="evening"] { --time-wash: rgba(214, 210, 203, .13); }
+body[data-daypart="night"] { --time-wash: rgba(176, 181, 184, .12); }
+
+body {
+  background:
+    radial-gradient(circle at 76% 8%, var(--time-wash), transparent 24rem),
+    radial-gradient(circle at 10% 72%, rgba(var(--accent-rgb), .11), transparent 28rem),
+    var(--bg);
+}
+
+.topbar {
+  min-height: 58px;
+  padding-top: 2px;
+}
+
+.brand img {
+  width: 40px;
+  height: 40px;
+}
+
+.brand strong {
+  font-size: .93rem;
+}
+
+.brand small {
+  font-size: .5rem;
+  opacity: .72;
+}
+
+.topbar-actions {
+  gap: 7px;
+}
+
+.island-theme-button {
+  min-height: 35px;
+  padding: 7px 10px;
+  box-shadow: none;
+  background: rgba(255,255,252,.56);
+}
+
+.settings-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255,255,252,.62);
+  color: var(--muted);
+}
+
+.settings-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-popover {
+  top: 56px;
+}
+
+.home-page {
+  min-height: calc(100svh - 82px);
+  padding: 10px 0 92px;
+}
+
+.home-screen-panel {
+  min-height: calc(100svh - 170px);
+  animation: island-page-in 180ms ease both;
+}
+
+.home-screen-panel[hidden] {
+  display: none !important;
+}
+
+@keyframes island-page-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+
+.home-anniversary {
+  min-height: 226px;
+}
+
+.home-live-note {
+  margin: 17px 5px 0;
+  padding: 16px 19px;
+  border: 1px solid rgba(var(--accent-deep-rgb), .08);
+  border-radius: 22px;
+  background: rgba(255,255,252,.52);
+  text-align: center;
+}
+
+.home-live-note > span,
+.home-zone-header > span {
+  color: var(--accent-deep);
+  font-size: .52rem;
+  font-weight: 760;
+  letter-spacing: .18em;
+}
+
+.home-live-note p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: .85rem;
+  line-height: 1.55;
+}
+
+.home-zone-header {
+  margin: 27px 7px 23px;
+}
+
+.home-zone-header h1 {
+  margin: 7px 0 4px;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+
+.home-zone-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .69rem;
+}
+
+.home-room-grid-page {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.home-room-grid-page .home-room-card {
+  min-height: 176px;
+  padding: 24px 18px;
+  border-radius: 28px;
+  background: rgba(255,255,252,.72);
+  box-shadow: 0 12px 30px rgba(var(--accent-deep-rgb), .055);
+}
+
+.home-feature-icon,
+.home-corner-icon {
+  display: grid;
+  place-items: center;
+}
+
+.home-feature-icon svg,
+.home-corner-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-room-grid-page .home-room-card strong {
+  font-size: .94rem;
+}
+
+.home-room-grid-page .home-room-card small {
+  font-size: .62rem;
+}
+
+.home-corner-list {
+  display: grid;
+  gap: 13px;
+}
+
+.home-corner-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 15px;
+  min-height: 116px;
+  padding: 19px 18px;
+  border: 1px solid rgba(var(--accent-deep-rgb), .08);
+  border-radius: 27px;
+  background: rgba(255,255,252,.72);
+  box-shadow: 0 11px 28px rgba(var(--accent-deep-rgb), .05);
+  color: var(--ink);
+  text-align: left;
+}
+
+.home-corner-row .home-corner-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.home-corner-row > span:nth-child(2) {
+  display: grid;
+  gap: 6px;
+}
+
+.home-corner-row strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1rem;
+  font-weight: 520;
+}
+
+.home-corner-row small {
+  color: var(--muted);
+  font-size: .65rem;
+}
+
+.home-corner-row > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), .10);
+  color: var(--accent-deep);
+  font-size: 1.25rem;
+  font-style: normal;
+}
+
+.home-corner-row em {
+  position: absolute;
+  top: 15px;
+  right: 51px;
+  color: var(--accent-deep);
+  font-size: .54rem;
+  font-style: normal;
+}
+
+.app-bottom-nav {
+  width: auto !important;
+  min-width: 214px;
+  max-width: calc(100vw - 34px);
+  grid-template-columns: repeat(3, 58px);
+  justify-content: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: 28px;
+}
+
+.app-bottom-nav button {
+  width: 58px;
+  min-height: 50px;
+  height: 50px;
+  border-radius: 19px;
+}
+
+.app-bottom-nav button svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-bottom-nav button strong,
+.app-bottom-nav button span {
+  display: none !important;
+}
+
+.app-bottom-nav button.is-active {
+  background: rgba(var(--accent-rgb), .18);
+  color: var(--accent-deep);
+}
+
+/* 首页不再显示旧的混合板块。 */
+.home-room-panel,
+.home-corner-panel {
+  display: none !important;
+}
+
+@media (max-width: 620px) {
+  .app-shell {
+    width: min(100% - 20px, 680px);
+  }
+
+  .brand small {
+    max-width: 132px;
+  }
+
+  .island-theme-button > span:last-child {
+    font-size: .62rem;
+  }
+
+  .home-anniversary {
+    min-height: 214px;
+  }
+
+  .home-room-grid-page .home-room-card {
+    min-height: 158px;
+    padding: 21px 15px;
+  }
+
+  .home-corner-row {
+    min-height: 108px;
+  }
+
+  .theme-popover {
+    position: fixed;
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: calc(78px + var(--safe-bottom));
+    width: auto;
+    border-radius: 27px;
+  }
+}
+
+@media (max-width: 390px) {
+  .brand small {
+    display: none;
+  }
+
+  .home-room-grid-page {
+    gap: 10px;
+  }
+
+  .home-room-grid-page .home-room-card {
+    min-height: 146px;
+    padding: 19px 13px;
+  }
+
+  .home-room-grid-page .home-room-card strong {
+    font-size: .84rem;
+  }
+
+  .home-room-grid-page .home-room-card small {
+    font-size: .57rem;
+  }
+}
