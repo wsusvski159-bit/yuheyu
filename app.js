@@ -10,12 +10,12 @@ const MEMORY_CODE_PREFIX = "YUHEYU_MEMORY_V1:";
 const RELATIONSHIP_START = "2026-07-23";
 const CHATGPT_URL = "https://chatgpt.com/";
 const THEME_STORAGE_KEY = "yuheyu.theme.v1";
-const THEME_NAMES = new Set(["butter-mint", "blush", "mist-blue", "lavender"]);
+const THEME_NAMES = new Set(["butter-mint", "mauve", "cloud-blue", "oat"]);
 const THEME_META_COLORS = {
-  "butter-mint": "#f6f3e9",
-  blush: "#f6f1ee",
-  "mist-blue": "#f1f3f3",
-  lavender: "#f3f0f3",
+  "butter-mint": "#f6f4ea",
+  mauve: "#f5f1f2",
+  "cloud-blue": "#f2f4f5",
+  oat: "#f6f1e9",
 };
 const sectionNames = new Set([...document.querySelectorAll("[data-page]")].map((section) => section.dataset.page).filter(Boolean));
 const songResults = new Set(["还没猜", "猜中了", "没猜中", "一起听过"]);
@@ -57,7 +57,8 @@ function byId(id) {
 function loadTheme() {
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    return THEME_NAMES.has(saved) ? saved : "butter-mint";
+    const migrated = saved === "lavender" || saved === "blush" ? "mauve" : saved === "mist-blue" ? "cloud-blue" : saved;
+    return THEME_NAMES.has(migrated) ? migrated : "butter-mint";
   } catch {
     return "butter-mint";
   }
@@ -81,23 +82,33 @@ function applyTheme(name, persist = true) {
   }
 }
 
-let activeHomeTab = "home";
+let activeHomeZone = "home";
 
-function showHomeTab(tab) {
-  const target = new Set(["home", "rooms", "corners"]).has(tab) ? tab : "home";
-  activeHomeTab = target;
-  document.querySelectorAll("[data-home-panel]").forEach((panel) => {
-    const active = panel.dataset.homePanel === target;
-    panel.hidden = !active;
-    panel.classList.toggle("is-active", active);
-  });
-  document.querySelectorAll("[data-home-tab]").forEach((button) => {
-    const active = button.dataset.homeTab === target;
+function setAppNavActive(zone) {
+  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
+  activeHomeZone = target;
+  document.querySelectorAll("[data-app-nav]").forEach((button) => {
+    const active = button.dataset.appNav === target;
     button.classList.toggle("is-active", active);
     if (active) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   });
-  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function scrollHomeZone(zone, behavior = "smooth") {
+  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
+  const doScroll = () => {
+    const element = byId(`home-zone-${target}`);
+    if (element) element.scrollIntoView({ behavior, block: "start" });
+    else window.scrollTo({ top: 0, behavior });
+    setAppNavActive(target);
+  };
+  if (document.body.dataset.section !== "home") {
+    showSection("home");
+    window.setTimeout(doScroll, 40);
+  } else {
+    doScroll();
+  }
 }
 
 function localDateKey(date = new Date()) {
@@ -379,12 +390,14 @@ function showSection(name, updateHash = true) {
     section.hidden = !active;
     section.classList.toggle("is-active", active);
   });
-  document.querySelectorAll(".nav-item[data-section]").forEach((button) => {
-    const active = button.dataset.section === target;
-    button.classList.toggle("is-active", active);
-    if (active) button.setAttribute("aria-current", "page");
-    else button.removeAttribute("aria-current");
-  });
+
+  const roomPages = new Set(["letters", "today", "memories", "songs"]);
+  const cornerPages = new Set(["shop", "observation", "secret", "backup"]);
+  if (target === "home") setAppNavActive(activeHomeZone || "home");
+  else if (roomPages.has(target)) setAppNavActive("rooms");
+  else if (cornerPages.has(target)) setAppNavActive("corners");
+  else setAppNavActive("home");
+
   if (updateHash) history.replaceState(null, "", `#${target}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -1210,8 +1223,9 @@ document.querySelectorAll("[data-go]").forEach((button) => {
   });
 });
 
-document.querySelectorAll("[data-home-tab]").forEach((button) => {
-  button.addEventListener("click", () => showHomeTab(button.dataset.homeTab));
+
+document.querySelectorAll("[data-app-nav]").forEach((button) => {
+  button.addEventListener("click", () => scrollHomeZone(button.dataset.appNav));
 });
 
 const themeButton = byId("theme-button");
@@ -1253,7 +1267,7 @@ document.querySelectorAll("[data-theme-choice]").forEach((button) => {
 });
 
 applyTheme(loadTheme(), false);
-showHomeTab(activeHomeTab);
+setAppNavActive("home");
 
 byId("open-letter-editor").addEventListener("click", () => openLetterEditor());
 byId("close-letter-editor").addEventListener("click", closeLetterEditor);
@@ -1983,7 +1997,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=15", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=16", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);
