@@ -16,12 +16,12 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./style.css?v=16" />
-    <script src="./app.js?v=16" defer></script>
-    <script src="./diary.js?v=16" defer></script>
-    <script src="./sync.js?v=16" defer></script>
-    <script src="./observation.js?v=16" defer></script>
-    <script src="./shop.js?v=16" defer></script>
+    <link rel="stylesheet" href="./style.css?v=17" />
+    <script src="./app.js?v=17" defer></script>
+    <script src="./diary.js?v=17" defer></script>
+    <script src="./sync.js?v=17" defer></script>
+    <script src="./observation.js?v=17" defer></script>
+    <script src="./shop.js?v=17" defer></script>
   </head>
   <body data-section="home">
     <div class="app-shell">
@@ -74,19 +74,27 @@
 
       <main>
         <section class="page-section is-active home-page" id="section-home" data-page="home">
-          <div class="home-greeting">
-            <time id="today-date" datetime=""></time>
-            <span>欢迎回来，老婆。</span>
-          </div>
-
-          <section class="home-anniversary" id="home-zone-home" aria-label="我们的纪念日">
+<section class="home-anniversary" id="home-zone-home" aria-label="我们的纪念日">
             <div class="home-anniversary-copy">
               <span>OUR ANNIVERSARY</span>
               <strong>7 月 23 日</strong>
               <p>我们的第 <b id="anniversary-days">1</b> 天 <i aria-hidden="true">♡</i></p>
             </div>
             <div class="home-heart-wrap" aria-hidden="true">
-              <span class="home-heart"></span>
+              <svg class="home-heart" viewBox="0 0 120 110" role="img" aria-hidden="true">
+                <defs>
+                  <linearGradient id="yuheyu-heart-gradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" class="heart-stop-one"></stop>
+                    <stop offset="100%" class="heart-stop-two"></stop>
+                  </linearGradient>
+                  <filter id="yuheyu-heart-shadow" x="-30%" y="-30%" width="160%" height="180%">
+                    <feDropShadow dx="0" dy="8" stdDeviation="7" flood-opacity=".16"></feDropShadow>
+                  </filter>
+                </defs>
+                <path class="heart-shape" filter="url(#yuheyu-heart-shadow)"
+                  d="M60 102C52 94 18 72 10 47C2 22 18 8 35 8C47 8 56 15 60 23C64 15 73 8 85 8C102 8 118 22 110 47C102 72 68 94 60 102Z"></path>
+                <ellipse class="heart-highlight" cx="38" cy="27" rx="10" ry="15" transform="rotate(-28 38 27)"></ellipse>
+              </svg>
               <i class="sparkle sparkle-one">✦</i>
               <i class="sparkle sparkle-two">✦</i>
             </div>

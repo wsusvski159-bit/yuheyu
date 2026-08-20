@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fffdf8"/>
+    <stop offset="1" stop-color="#ebe8da"/>
+  </linearGradient>
+  <linearGradient id="curtain" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#eee8dc"/>
+    <stop offset="1" stop-color="#fffdf8" stop-opacity=".78"/>
+  </linearGradient>
+</defs>
+<rect width="180" height="180" rx="34" fill="url(#bg)"/>
+<rect x="72" y="18" width="88" height="106" rx="5" fill="#f9faf4" stroke="#d9ddcd" stroke-width="2"/>
+<line x1="116" y1="18" x2="116" y2="124" stroke="#d4d8ca" stroke-width="2"/>
+<line x1="72" y1="71" x2="160" y2="71" stroke="#d4d8ca" stroke-width="2"/>
+<path d="M18 13C43 24 49 42 49 78C49 115 43 147 25 172H7V13Z" fill="url(#curtain)"/>
+<path d="M49 14C66 31 66 55 66 89C66 126 60 148 47 171H25C43 145 49 114 49 78C49 43 43 25 18 13Z" fill="#f5f0e6" opacity=".86"/>
+<rect x="0" y="124" width="180" height="56" fill="#e8e4d7"/>
+<ellipse cx="103" cy="145" rx="24" ry="5" fill="#d2cbb8" opacity=".55"/>
+<path d="M91 133H115L111 157H95Z" fill="#b8ac8c"/>
+<path d="M103 133C102 114 96 102 86 92M103 129C109 111 118 101 131 95M102 119C93 111 85 107 76 107M106 114C116 108 126 108 137 111" fill="none" stroke="#8e977b" stroke-width="3.2" stroke-linecap="round"/>
+<ellipse cx="85" cy="91" rx="9" ry="4" transform="rotate(35 85 91)" fill="#a6af93"/>
+<ellipse cx="132" cy="95" rx="10" ry="4.5" transform="rotate(-28 132 95)" fill="#a6af93"/>
+<ellipse cx="76" cy="107" rx="9" ry="4" transform="rotate(12 76 107)" fill="#a6af93"/>
+<ellipse cx="138" cy="111" rx="9" ry="4" transform="rotate(16 138 111)" fill="#a6af93"/>
+<ellipse cx="140" cy="145" rx="18" ry="6" fill="#d6cfbe"/>
+<rect x="129" y="137" width="20" height="9" rx="4.5" fill="#f8f4e9" stroke="#cfc7b2" stroke-width="1.5"/>
+</svg>

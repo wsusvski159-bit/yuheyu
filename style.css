@@ -3793,3 +3793,190 @@ body {
   .app-bottom-nav { width: calc(100% - 18px); }
   .app-bottom-nav button { min-height: 54px; }
 }
+
+
+
+/* ===== v1.7 · 实机修正：严格跟随最终参考图 ===== */
+
+/* 最终参考图没有日期/欢迎语这一行。 */
+.home-greeting {
+  display: none !important;
+}
+
+/* header 与第一张卡之间保持参考图里的紧凑距离。 */
+.home-page {
+  padding-top: 12px;
+}
+
+/* 实机上 CSS 拼接心形会变成两个泡泡；改成稳定的内联 SVG。 */
+.home-heart-wrap {
+  width: 126px;
+  height: 118px;
+  display: grid;
+  place-items: center;
+}
+
+.home-heart {
+  position: static !important;
+  width: 118px !important;
+  height: 108px !important;
+  overflow: visible;
+  transform: none !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.home-heart::before,
+.home-heart::after {
+  display: none !important;
+}
+
+.heart-stop-one {
+  stop-color: rgba(255, 255, 252, .92);
+}
+
+.heart-stop-two {
+  stop-color: var(--accent);
+}
+
+.heart-shape {
+  fill: url(#yuheyu-heart-gradient);
+  stroke: rgba(var(--accent-deep-rgb), .10);
+  stroke-width: 1;
+}
+
+.heart-highlight {
+  fill: rgba(255, 255, 255, .58);
+}
+
+.sparkle-one {
+  left: 0;
+  bottom: 13px;
+}
+.sparkle-two {
+  right: 0;
+  top: 8px;
+}
+
+/* 把日记圆图换成固定的小窗 + 绿植插画，避免手机上变成抽象色块。 */
+.home-diary-photo {
+  background: url("./icons/diary-window.svg") center / cover no-repeat !important;
+}
+
+.home-diary-photo::before,
+.home-diary-photo::after {
+  display: none !important;
+}
+
+/* 关键实机 bug：v1.6 少了 translateX(-50%)，所以底栏从屏幕中线向右长。 */
+.app-bottom-nav {
+  left: 50% !important;
+  right: auto !important;
+  width: min(650px, calc(100vw - 20px)) !important;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+  transform: translateX(-50%) !important;
+}
+
+/* 防止内部文字或按钮把页面撑出手机宽度。 */
+.app-shell,
+.home-page,
+.home-anniversary,
+.home-diary-bubble,
+.home-room-panel,
+.home-corner-panel,
+.home-room-card,
+.home-corner-card,
+.app-bottom-nav {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.home-room-card strong,
+.home-room-card small,
+.home-corner-card strong,
+.home-corner-card small {
+  overflow-wrap: anywhere;
+}
+
+/* 手机上的参考图比 v1.6 更白一点，仍保持低饱和。 */
+.home-anniversary,
+.home-diary-bubble {
+  background:
+    radial-gradient(circle at 84% 62%, rgba(var(--accent-rgb), .10), transparent 10rem),
+    rgba(255, 255, 252, .91);
+}
+
+.home-room-panel,
+.home-corner-panel {
+  background: rgba(255, 255, 252, .66);
+}
+
+.home-room-card,
+.home-corner-card {
+  background: rgba(255, 255, 253, .78);
+}
+
+@media (max-width: 620px) {
+  .home-page {
+    padding-top: 9px;
+  }
+
+  .home-anniversary {
+    min-height: 214px;
+    padding: 28px 22px;
+  }
+
+  .home-heart-wrap {
+    width: 98px;
+    height: 94px;
+  }
+
+  .home-heart {
+    width: 94px !important;
+    height: 88px !important;
+  }
+
+  .home-diary-bubble {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .home-diary-photo {
+    width: 78px;
+    height: 78px;
+  }
+
+  /* 让底栏刚好处在手机左右安全边距里。 */
+  .app-bottom-nav {
+    width: calc(100vw - 18px) !important;
+    bottom: max(8px, var(--safe-bottom));
+  }
+}
+
+@media (max-width: 390px) {
+  .home-anniversary {
+    min-height: 198px;
+    padding: 25px 18px;
+  }
+
+  .home-heart-wrap {
+    width: 82px;
+    height: 80px;
+  }
+
+  .home-heart {
+    width: 80px !important;
+    height: 75px !important;
+  }
+
+  .home-diary-bubble {
+    grid-template-columns: 66px minmax(0, 1fr);
+  }
+
+  .home-diary-photo {
+    width: 66px;
+    height: 66px;
+  }
+}

@@ -1939,13 +1939,15 @@ window.addEventListener("appinstalled", () => {
 
 const now = new Date();
 const dateElement = byId("today-date");
-dateElement.dateTime = now.toISOString();
-dateElement.textContent = new Intl.DateTimeFormat("zh-CN", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  weekday: "long",
-}).format(now);
+if (dateElement) {
+  dateElement.dateTime = now.toISOString();
+  dateElement.textContent = new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  }).format(now);
+}
 
 const startDate = new Date(`${RELATIONSHIP_START}T00:00:00`);
 const todaySerial = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -1997,7 +1999,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=16", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=17", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);
