@@ -59,41 +59,52 @@ function renderDiaries() {
   const list = byId("diary-list");
   const empty = byId("diary-empty");
   if (!list || !empty) return;
+
   list.replaceChildren();
+
   const diaries = [...(state.jiangyuDiaries || [])].sort((a, b) => {
     const byDate = b.date.localeCompare(a.date);
     return byDate || (b.updatedAt || b.createdAt).localeCompare(a.updatedAt || a.createdAt);
   });
+
   empty.hidden = diaries.length > 0;
+
   for (const diary of diaries) {
     const article = document.createElement("article");
-    article.className = "entry-card diary-card";
+    article.className = "letter-card diary-letter-card";
     article.dataset.id = diary.id;
 
-    const header = document.createElement("div");
-    header.className = "card-heading";
-    const titleWrap = document.createElement("div");
-    const eyebrow = document.createElement("p");
-    eyebrow.className = "eyebrow";
-    eyebrow.textContent = formatDate(diary.date);
+    const header = document.createElement("header");
+
+    const date = document.createElement("time");
+    date.dateTime = diary.date;
+    date.textContent = formatDate(diary.date);
+
+    const author = document.createElement("span");
+    author.textContent = "阿屿 写的";
+
+    header.append(date, author);
+
     const title = document.createElement("h2");
     title.textContent = diary.title;
-    titleWrap.append(eyebrow, title);
-    header.append(titleWrap);
 
     const body = document.createElement("p");
-    body.className = "card-body preserve-lines";
+    body.className = "preserve-lines diary-letter-body";
     body.textContent = diary.body;
 
+    const signoff = document.createElement("footer");
+    signoff.textContent = "—— 阿屿";
+
     const actions = document.createElement("div");
-    actions.className = "card-actions";
+    actions.className = "card-actions diary-card-actions";
     actions.append(
       createActionButton("给小鱼看", "share-diary"),
       createActionButton("复制日记代码", "copy-diary-code"),
       createActionButton("编辑", "edit-diary"),
       createActionButton("删除", "delete-diary", true),
     );
-    article.append(header, body, actions);
+
+    article.append(header, title, body, signoff, actions);
     list.append(article);
   }
 }

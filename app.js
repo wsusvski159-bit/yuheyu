@@ -2024,7 +2024,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=18", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=19", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);

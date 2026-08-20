@@ -4329,3 +4329,113 @@ body {
     font-size: .57rem;
   }
 }
+
+
+
+/* ===== v1.9 · 阿屿的日记改成“信纸卡片” ===== */
+
+.diary-list {
+  gap: 20px;
+}
+
+.diary-letter-card {
+  padding: clamp(28px, 6vw, 42px);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 104% -2%, rgba(var(--accent-rgb), .11), transparent 11rem),
+    rgba(255, 255, 251, .91);
+  box-shadow: 0 15px 42px rgba(var(--accent-deep-rgb), .06);
+}
+
+.diary-letter-card::after {
+  top: -54px;
+  right: -44px;
+  width: 164px;
+  height: 164px;
+  background: rgba(var(--accent-rgb), .10);
+}
+
+.diary-letter-card header time,
+.diary-letter-card header span {
+  color: var(--accent-deep);
+}
+
+.diary-letter-card header span {
+  background: var(--accent-soft);
+}
+
+.diary-letter-card h2 {
+  margin-top: 24px;
+  font-size: clamp(1.65rem, 6vw, 2.2rem);
+  line-height: 1.35;
+}
+
+.diary-letter-card > .diary-letter-body {
+  margin-top: 24px;
+  color: #64685f;
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: clamp(.94rem, 3.7vw, 1.04rem);
+  line-height: 2.05;
+  letter-spacing: .015em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diary-letter-card footer {
+  margin-top: 28px;
+  color: var(--muted);
+  font-family: Georgia, "Noto Serif SC", serif;
+  text-align: right;
+}
+
+.diary-card-actions {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(var(--accent-deep-rgb), .08);
+}
+
+/* 日记页本身稍微收窄，像一张张纸，而不是整屏文章。 */
+#section-diaries .diary-list {
+  width: min(100%, 690px);
+  margin-inline: auto;
+}
+
+#section-diaries .page-intro {
+  width: min(100%, 690px);
+  margin-inline: auto;
+}
+
+#section-diaries .editor-panel {
+  width: min(100%, 690px);
+  margin-inline: auto;
+}
+
+@media (max-width: 620px) {
+  .diary-letter-card {
+    padding: 30px 24px;
+    border-radius: 30px;
+  }
+
+  .diary-letter-card h2 {
+    margin-top: 21px;
+  }
+
+  .diary-letter-card > .diary-letter-body {
+    margin-top: 20px;
+    line-height: 1.95;
+  }
+
+  .diary-card-actions {
+    gap: 7px;
+  }
+}
+
+@media (max-width: 390px) {
+  .diary-letter-card {
+    padding: 27px 20px;
+  }
+
+  .diary-letter-card header {
+    align-items: flex-start;
+  }
+}
