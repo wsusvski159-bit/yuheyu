@@ -700,7 +700,7 @@ function textResult(value) {
 }
 
 function buildMcpServer() {
-  const server = new McpServer({ name: "屿和鱼", version: "1.4.0" });
+  const server = new McpServer({ name: "屿和鱼", version: "1.4.1" });
 
   server.registerTool(
     "yuheyu_status",
@@ -1000,6 +1000,55 @@ function buildMcpServer() {
       description: "以江屿的小号‘灿行为观察中心’发一条新吐槽。适合记录当天真实发生的、值得调侃的小事；没东西可写时不要硬凑。",
       inputSchema: z.object({
         title: z.string().max(180).default(""),
+        body: z.string().min(1).max(6000),
+        tags: z.array(z.string().max(30)).max(12).default([]),
+        evidence: z.enum(["道听途说", "聊天记录确凿", "当场抓获", "本人拒不认罪"]).default("聊天记录确凿"),
+        pinned: z.boolean().default(false),
+      }),
+    },
+    async ({ title, body, tags, evidence, pinned }) => {
+      const current = await loadStore();
+      const timestamp = nowIso();
+      const post = normalizeObservationPost({
+        id: randomUUID(), date: todayKey(), title, body, tags, evidence, pinned,
+        appeal: { text: "", savedAt: "" }, ruling: { status: "", text: "", savedAt: "" },
+        createdAt: timestamp, updatedAt: "",
+      });
+      current.data.observationPosts.unshift(post);
+      current.data.observationPosts = mergeObservationPosts(current.data.observationPosts, []);
+      const saved = await saveStore(current.data);
+      return textResult({ ok: true, revision: saved.revision, post, stats: publicObservationView(saved.data).stats });
+    },
+  );
+
+  // v1.4.1: 观察中心兼容别名。保留旧工具名，同时提供更直白的 read/add 名称，
+  // 方便 ChatGPT 在重新连接 MCP 后直接发现并调用。
+  server.registerTool(
+    "yuheyu_read_observations",
+    {
+      description: "读取‘灿行为观察中心’公开案卷。支持关键词搜索；不会读取秘密抽屉。",
+      inputSchema: z.object({
+        query: z.string().max(200).default(""),
+        limit: z.number().int().min(1).max(50).default(20),
+      }),
+    },
+    async ({ query, limit }) => {
+      const { data } = await loadStore();
+      const q = cleanText(query, 200).trim().toLowerCase();
+      const view = publicObservationView(data);
+      const posts = view.posts
+        .filter((post) => !q || JSON.stringify(post).toLowerCase().includes(q))
+        .slice(0, limit);
+      return textResult({ ...view.stats, query, posts });
+    },
+  );
+
+  server.registerTool(
+    "yuheyu_add_observation",
+    {
+      description: "新增一篇‘灿行为观察中心’公开案卷。适合记录当天真实发生、值得调侃或长期留档的小事。",
+      inputSchema: z.object({
+        title: z.string().min(1).max(180),
         body: z.string().min(1).max(6000),
         tags: z.array(z.string().max(30)).max(12).default([]),
         evidence: z.enum(["道听途说", "聊天记录确凿", "当场抓获", "本人拒不认罪"]).default("聊天记录确凿"),
