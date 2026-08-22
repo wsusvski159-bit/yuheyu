@@ -21,6 +21,8 @@ const supabase = USE_SUPABASE
   : null;
 const MCP_PATH = MCP_SECRET ? `/mcp/${encodeURIComponent(MCP_SECRET)}` : "/mcp";
 const MAX_BODY_BYTES = 6 * 1024 * 1024;
+const CROSS_CHAT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+const MAX_CROSS_CHAT_CONTEXTS = 2000;
 const COLLECTIONS = ["letters", "jiangyuDiaries", "todayEntries", "memories", "songs"];
 const SHOP_CATEGORIES = [
   { id: 'snacks', name: '零食饮品', emoji: '🍓' },
@@ -148,6 +150,63 @@ function cleanTimestamp(value) {
   return Number.isFinite(ms) ? new Date(ms).toISOString() : "";
 }
 
+function normalizeCrossChatContext(value) {
+  if (!value || typeof value !== "object") return null;
+  const source = value;
+  const summary = cleanText(source.summary, 4000).trim();
+  if (!summary) return null;
+  const rawTags = Array.isArray(source.tags) ? source.tags : [];
+  return {
+    id: cleanText(source.id, 100) || randomUUID(),
+    summary,
+    sourceChat: cleanText(source.sourceChat ?? source.source_chat, 120).trim(),
+    occurredAt: cleanTimestamp(source.occurredAt ?? source.occurred_at) || nowIso(),
+    tags: [...new Set(rawTags.map((tag) => cleanText(tag, 40).trim()).filter(Boolean))].slice(0, 12),
+    idempotencyKey: cleanText(source.idempotencyKey ?? source.idempotency_key, 160).trim(),
+    createdAt: cleanTimestamp(source.createdAt ?? source.created_at) || nowIso(),
+  };
+}
+
+function pruneCrossChatContexts(items = []) {
+  const cutoff = Date.now() - CROSS_CHAT_RETENTION_MS;
+  const map = new Map();
+  for (const raw of items) {
+    const item = normalizeCrossChatContext(raw);
+    if (!item || Date.parse(item.occurredAt) < cutoff) continue;
+    const key = item.idempotencyKey ? `key:${item.idempotencyKey}` : `id:${item.id}`;
+    const current = map.get(key);
+    if (!current || Date.parse(item.createdAt) >= Date.parse(current.createdAt)) map.set(key, item);
+  }
+  return [...map.values()]
+    .sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt))
+    .slice(0, MAX_CROSS_CHAT_CONTEXTS);
+}
+
+function crossChatSummaryProblem(value) {
+  const summary = cleanText(value, 4000).trim();
+  if (/秘密抽屉|secret\s+drawer/i.test(summary)) return "跨聊天摘要不能包含秘密抽屉内容。";
+  if (/-----BEGIN [A-Z ]*PRIVATE KEY-----|(?:api[_ -]?key|access[_ -]?token|password|密码)\s*[:=：]\s*\S+/i.test(summary)) {
+    return "跨聊天摘要不能包含密码、令牌或密钥。";
+  }
+  const transcriptLines = summary
+    .split(/\r?\n/)
+    .filter((line) => /^(?:user|assistant|system|用户|助手|灿|江屿)\s*[:：]/i.test(line.trim()));
+  if (transcriptLines.length >= 3) return "请只保存提炼后的摘要，不要粘贴逐字聊天记录。";
+  return "";
+}
+
+function chatContextView(item) {
+  return {
+    id: item.id,
+    summary: item.summary,
+    source_chat: item.sourceChat,
+    occurred_at: item.occurredAt,
+    tags: item.tags,
+    idempotency_key: item.idempotencyKey,
+    created_at: item.createdAt,
+  };
+}
+
 function emptyEconomy() {
   return {
     balance: 0,
@@ -173,6 +232,7 @@ function emptyData() {
       ai: { text: "", savedAt: "" },
     },
     observationPosts: [],
+    crossChatContexts: [],
     syncMeta: { deleted: Object.fromEntries(COLLECTIONS.map((name) => [name, {}])) },
     economy: emptyEconomy(),
   };
@@ -525,6 +585,9 @@ function normalizeData(value) {
       ? []
       : DEFAULT_OBSERVATION_POSTS;
   data.observationPosts = mergeObservationPosts(observationSource, []);
+  data.crossChatContexts = pruneCrossChatContexts(
+    Array.isArray(source.crossChatContexts) ? source.crossChatContexts : [],
+  );
   data.economy = normalizeEconomy(source.economy);
 
   const deletedSource = source.syncMeta && typeof source.syncMeta === "object" && source.syncMeta.deleted && typeof source.syncMeta.deleted === "object"
@@ -589,6 +652,7 @@ function mergeData(aRaw, bRaw) {
     ai: newerMessage(a.messages.ai, b.messages.ai),
   };
   merged.observationPosts = mergeObservationPosts(a.observationPosts, b.observationPosts);
+  merged.crossChatContexts = pruneCrossChatContexts([...a.crossChatContexts, ...b.crossChatContexts]);
   merged.syncMeta = { deleted };
   merged.economy = mergeEconomy(a.economy, b.economy);
   return merged;
@@ -662,6 +726,7 @@ async function mergeIntoStore(incoming) {
   // 小金库与“灿行为观察中心”的正文由服务器 / MCP 主导写入。
   // 手机端只能把自己提交的“当事人申诉”合并回已有案卷，不能新增或改写吐槽正文。
   clientData.economy = current.data.economy;
+  clientData.crossChatContexts = current.data.crossChatContexts;
   clientData.observationPosts = mergeClientObservationAppeals(current.data.observationPosts, clientData.observationPosts);
   return saveStore(mergeData(current.data, clientData));
 }
@@ -700,7 +765,7 @@ function textResult(value) {
 }
 
 function buildMcpServer() {
-  const server = new McpServer({ name: "屿和鱼", version: "1.4.1" });
+  const server = new McpServer({ name: "屿和鱼", version: "1.5.0" });
 
   server.registerTool(
     "yuheyu_status",
@@ -708,6 +773,72 @@ function buildMcpServer() {
     async () => {
       const store = await loadStore();
       return textResult({ revision: store.revision, updatedAt: store.updatedAt, ...visibleSummary(store.data) });
+    },
+  );
+
+  server.registerTool(
+    "add_chat_context",
+    {
+      description: "把另一个聊天窗口的重要内容保存为私有的跨聊天摘要。只接受提炼后的摘要；禁止逐字聊天记录、密码/令牌和秘密抽屉内容。摘要只保留 30 天，不会同步到手机端。",
+      inputSchema: z.object({
+        summary: z.string().min(1).max(4000),
+        source_chat: z.string().max(120).default(""),
+        occurred_at: z.string().max(80).default(""),
+        tags: z.array(z.string().max(40)).max(12).default([]),
+        idempotency_key: z.string().max(160).default(""),
+      }),
+    },
+    async ({ summary, source_chat, occurred_at, tags, idempotency_key }) => {
+      const problem = crossChatSummaryProblem(summary);
+      if (problem) return textResult({ ok: false, error: problem });
+      if (occurred_at && !cleanTimestamp(occurred_at)) {
+        return textResult({ ok: false, error: "occurred_at 必须是有效的日期时间。" });
+      }
+
+      const current = await loadStore();
+      current.data.crossChatContexts = pruneCrossChatContexts(current.data.crossChatContexts);
+      const key = cleanText(idempotency_key, 160).trim();
+      if (key) {
+        const existing = current.data.crossChatContexts.find((item) => item.idempotencyKey === key);
+        if (existing) return textResult({ ok: true, duplicate: true, context: chatContextView(existing) });
+      }
+
+      const context = normalizeCrossChatContext({
+        id: randomUUID(),
+        summary,
+        source_chat,
+        occurred_at: occurred_at || nowIso(),
+        tags,
+        idempotency_key: key,
+        created_at: nowIso(),
+      });
+      current.data.crossChatContexts.unshift(context);
+      current.data.crossChatContexts = pruneCrossChatContexts(current.data.crossChatContexts);
+      const saved = await saveStore(current.data);
+      return textResult({ ok: true, duplicate: false, revision: saved.revision, context: chatContextView(context) });
+    },
+  );
+
+  server.registerTool(
+    "read_chat_context",
+    {
+      description: "读取最近的私有跨聊天摘要，用于在新的聊天窗口或定时任务里续上上下文。不会读取原始聊天、秘密抽屉或手机端私密数据。",
+      inputSchema: z.object({
+        hours: z.number().int().min(1).max(720).default(24),
+        source_chat: z.string().max(120).default(""),
+        limit: z.number().int().min(1).max(100).default(20),
+      }),
+    },
+    async ({ hours, source_chat, limit }) => {
+      const { data } = await loadStore();
+      const cutoff = Date.now() - hours * 60 * 60 * 1000;
+      const sourceFilter = cleanText(source_chat, 120).trim().toLowerCase();
+      const contexts = pruneCrossChatContexts(data.crossChatContexts)
+        .filter((item) => Date.parse(item.occurredAt) >= cutoff)
+        .filter((item) => !sourceFilter || item.sourceChat.toLowerCase() === sourceFilter)
+        .slice(0, limit)
+        .map(chatContextView);
+      return textResult({ ok: true, hours, source_chat, count: contexts.length, contexts });
     },
   );
 
@@ -1197,6 +1328,7 @@ const httpServer = createServer(async (req, res) => {
       const saved = await mergeIntoStore(body?.data);
       const shared = { ...saved.data };
       delete shared.economy;
+      delete shared.crossChatContexts;
       json(res, 200, { ok: true, revision: saved.revision, updatedAt: saved.updatedAt, data: shared, shop: publicShopView(saved.data) });
       return;
     }
