@@ -765,7 +765,7 @@ function textResult(value) {
 }
 
 function buildMcpServer() {
-  const server = new McpServer({ name: "屿和鱼", version: "1.5.0" });
+  const server = new McpServer({ name: "屿和鱼", version: "1.5.1" });
 
   server.registerTool(
     "yuheyu_status",
@@ -777,7 +777,7 @@ function buildMcpServer() {
   );
 
   server.registerTool(
-    "add_chat_context",
+    "yuheyu_add_chat_context",
     {
       description: "把另一个聊天窗口的重要内容保存为私有的跨聊天摘要。只接受提炼后的摘要；禁止逐字聊天记录、密码/令牌和秘密抽屉内容。摘要只保留 30 天，不会同步到手机端。",
       inputSchema: z.object({
@@ -820,7 +820,7 @@ function buildMcpServer() {
   );
 
   server.registerTool(
-    "read_chat_context",
+    "yuheyu_read_chat_context",
     {
       description: "读取最近的私有跨聊天摘要，用于在新的聊天窗口或定时任务里续上上下文。不会读取原始聊天、秘密抽屉或手机端私密数据。",
       inputSchema: z.object({
