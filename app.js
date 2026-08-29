@@ -10,16 +10,33 @@ const MEMORY_CODE_PREFIX = "YUHEYU_MEMORY_V1:";
 const RELATIONSHIP_START = "2026-07-23";
 const CHATGPT_URL = "https://chatgpt.com/";
 const THEME_STORAGE_KEY = "yuheyu.theme.v1";
-const THEME_NAMES = new Set(["butter-mint", "mauve", "cloud-blue", "oat"]);
+const THEME_NAMES = new Set(["butter-mint", "blush", "mist-blue", "lavender"]);
 const THEME_META_COLORS = {
-  "butter-mint": "#f6f4ea",
-  mauve: "#f5f1f2",
-  "cloud-blue": "#f2f4f5",
-  oat: "#f6f1e9",
+  "butter-mint": "#f6f3e9",
+  blush: "#f6f1ee",
+  "mist-blue": "#f1f3f3",
+  lavender: "#f3f0f3",
 };
 const sectionNames = new Set([...document.querySelectorAll("[data-page]")].map((section) => section.dataset.page).filter(Boolean));
 const songResults = new Set(["还没猜", "猜中了", "没猜中", "一起听过"]);
 const moodOptions = new Set(["开心", "平静", "想你", "害羞", "委屈", "疲惫"]);
+const DAILY_ARCHIVE_TAG = "每日聊天档案";
+const DAILY_ARCHIVE_TITLE_PREFIX = "聊天档案｜";
+
+function isDailyChatArchive(memory) {
+  if (!memory || typeof memory !== "object") return false;
+  const tags = Array.isArray(memory.tags) ? memory.tags : [];
+  return tags.includes(DAILY_ARCHIVE_TAG) || String(memory.title || "").startsWith(DAILY_ARCHIVE_TITLE_PREFIX);
+}
+
+function archiveMemories() {
+  return (state.memories || [])
+    .filter(isDailyChatArchive)
+    .sort((left, right) =>
+      String(right.date || "").localeCompare(String(left.date || "")) ||
+      String(right.createdAt || "").localeCompare(String(left.createdAt || "")),
+    );
+}
 
 const emptyState = () => ({
   dailyNote: { text: "", savedAt: "" },
@@ -57,8 +74,7 @@ function byId(id) {
 function loadTheme() {
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    const migrated = saved === "lavender" || saved === "blush" ? "mauve" : saved === "mist-blue" ? "cloud-blue" : saved;
-    return THEME_NAMES.has(migrated) ? migrated : "butter-mint";
+    return THEME_NAMES.has(saved) ? saved : "butter-mint";
   } catch {
     return "butter-mint";
   }
@@ -82,42 +98,23 @@ function applyTheme(name, persist = true) {
   }
 }
 
-let activeHomeZone = "home";
+let activeHomeTab = "home";
 
-function setAppNavActive(zone) {
-  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
-  activeHomeZone = target;
-  document.querySelectorAll("[data-app-nav]").forEach((button) => {
-    const active = button.dataset.appNav === target;
+function showHomeTab(tab) {
+  const target = new Set(["home", "rooms", "corners"]).has(tab) ? tab : "home";
+  activeHomeTab = target;
+  document.querySelectorAll("[data-home-panel]").forEach((panel) => {
+    const active = panel.dataset.homePanel === target;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+  document.querySelectorAll("[data-home-tab]").forEach((button) => {
+    const active = button.dataset.homeTab === target;
     button.classList.toggle("is-active", active);
     if (active) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
   });
-}
-
-function renderHomeZone(zone) {
-  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
-  document.querySelectorAll("[data-home-zone-panel]").forEach((panel) => {
-    const active = panel.dataset.homeZonePanel === target;
-    panel.hidden = !active;
-    panel.classList.toggle("is-active", active);
-  });
-  document.body.dataset.homeZone = target;
-  setAppNavActive(target);
-}
-
-function showHomeZone(zone, behavior = "smooth") {
-  const target = new Set(["home", "rooms", "corners"]).has(zone) ? zone : "home";
-  if (document.body.dataset.section !== "home") showSection("home", false);
-  renderHomeZone(target);
-  history.replaceState(null, "", "#home");
-  window.scrollTo({ top: 0, behavior });
-}
-
-function updateDaypart() {
-  const hour = new Date().getHours();
-  const daypart = hour < 6 ? "night" : hour < 12 ? "morning" : hour < 18 ? "afternoon" : hour < 22 ? "evening" : "night";
-  document.body.dataset.daypart = daypart;
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function localDateKey(date = new Date()) {
@@ -399,14 +396,12 @@ function showSection(name, updateHash = true) {
     section.hidden = !active;
     section.classList.toggle("is-active", active);
   });
-
-  const roomPages = new Set(["letters", "today", "memories", "songs"]);
-  const cornerPages = new Set(["shop", "observation", "secret", "backup"]);
-  if (target === "home") renderHomeZone(activeHomeZone || "home");
-  else if (roomPages.has(target)) setAppNavActive("rooms");
-  else if (cornerPages.has(target)) setAppNavActive("corners");
-  else setAppNavActive("home");
-
+  document.querySelectorAll(".nav-item[data-section]").forEach((button) => {
+    const active = button.dataset.section === target;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
   if (updateHash) history.replaceState(null, "", `#${target}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -416,7 +411,20 @@ function renderHome() {
   const diaryCount = byId("diary-count");
   if (diaryCount) diaryCount.textContent = String(state.jiangyuDiaries.length);
   byId("today-count").textContent = String(state.todayEntries.length);
-  byId("memory-count").textContent = String(state.memories.length);
+  const archives = archiveMemories();
+  const regularMemories = state.memories.filter((memory) => !isDailyChatArchive(memory));
+  byId("memory-count").textContent = String(regularMemories.length);
+  const archiveCount = byId("archive-count");
+  if (archiveCount) archiveCount.textContent = String(archives.length);
+  const archiveStatus = byId("home-archive-status");
+  if (archiveStatus) {
+    const todayArchive = archives.find((memory) => memory.date === localDateKey());
+    archiveStatus.textContent = todayArchive
+      ? "今天已经归档，打开看看我们都聊了什么"
+      : archives.length
+        ? `最新归档 ${formatDate(archives[0].date)}`
+        : "流水账版的我们，从早到晚慢慢留下";
+  }
   byId("song-count").textContent = String(state.songs.length);
 
   const observationCount = byId("observation-count");
@@ -427,7 +435,7 @@ function renderHome() {
   if (observationStatus) {
     observationStatus.textContent = todaysObservationCount
       ? `今日新增案件 ${todaysObservationCount}`
-      : "本号今日仍坚持客观";
+      : "今日暂无新案件";
   }
 
   const latestDiary = [...state.jiangyuDiaries].sort((left, right) => {
@@ -442,25 +450,10 @@ function renderHome() {
   if (latestDiary) {
     if (diaryTitle) diaryTitle.textContent = latestDiary.title || "阿屿的日记";
     if (diaryDate) {
-      const created = latestDiary.createdAt ? new Date(latestDiary.createdAt) : null;
-      const todayKey = localDateKey();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayKey = localDateKey(yesterday);
-      if (created && !Number.isNaN(created.getTime())) {
-        const time = new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(created);
-        const createdKey = localDateKey(created);
-        diaryDate.textContent = createdKey === todayKey
-          ? `今天 ${time} 写过一页`
-          : createdKey === yesterdayKey
-            ? `昨晚 ${time} 写过一页`
-            : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(created);
-      } else {
-        const date = new Date(`${latestDiary.date}T00:00:00`);
-        diaryDate.textContent = Number.isNaN(date.getTime())
-          ? latestDiary.date
-          : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
-      }
+      const date = new Date(`${latestDiary.date}T00:00:00`);
+      diaryDate.textContent = Number.isNaN(date.getTime())
+        ? latestDiary.date
+        : new Intl.DateTimeFormat("zh-CN", { month: "numeric", day: "numeric" }).format(date);
     }
     if (diaryExcerpt) {
       const text = String(latestDiary.body || "").replace(/\s+/g, " ").trim();
@@ -896,13 +889,68 @@ function renderTodayPreview() {
   else image.removeAttribute("src");
 }
 
+function renderArchives() {
+  const list = byId("archive-list");
+  if (!list) return;
+  list.replaceChildren();
+  const archives = archiveMemories();
+  const pageCount = byId("archive-page-count");
+  if (pageCount) pageCount.textContent = String(archives.length);
+
+  const today = localDateKey();
+  const todayArchive = archives.find((memory) => memory.date === today);
+  const todayStatus = byId("archive-today-status");
+  if (todayStatus) {
+    todayStatus.textContent = todayArchive ? "今天已经归档" : "今天还在发生";
+  }
+
+  for (const memory of archives) {
+    const article = document.createElement("article");
+    article.className = "archive-card";
+    article.dataset.id = memory.id;
+
+    const head = document.createElement("div");
+    head.className = "archive-card-head";
+    const date = document.createElement("time");
+    date.dateTime = memory.date;
+    date.textContent = formatDate(memory.date);
+    const badge = document.createElement("span");
+    badge.textContent = memory.date === today ? "今天" : "聊天档案";
+    head.append(date, badge);
+
+    const title = document.createElement("h2");
+    title.textContent = memory.date === today ? "今天的我们" : `${formatDate(memory.date)}的我们`;
+
+    const rawText = String(memory.text || "").trim();
+    const excerpt = document.createElement("p");
+    const compact = rawText.replace(/\s+/g, " ");
+    excerpt.className = "archive-excerpt";
+    excerpt.textContent = compact.length > 150 ? `${compact.slice(0, 150)}……` : compact;
+
+    const details = document.createElement("details");
+    details.className = "archive-details";
+    const summary = document.createElement("summary");
+    summary.textContent = "展开完整档案";
+    const fullText = document.createElement("div");
+    fullText.className = "archive-full-text";
+    fullText.textContent = rawText;
+    details.append(summary, fullText);
+
+    article.append(head, title, excerpt, details);
+    list.append(article);
+  }
+
+  const empty = byId("archive-empty");
+  if (empty) empty.hidden = archives.length > 0;
+}
+
 function renderMemories() {
   const list = byId("memory-list");
   list.replaceChildren();
   const query = memorySearchQuery.trim().toLocaleLowerCase("zh-CN");
-  const allMemories = [...state.memories].sort(
-    (a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt),
-  );
+  const allMemories = state.memories
+    .filter((memory) => !isDailyChatArchive(memory))
+    .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
   const memories = allMemories.filter((memory) => {
     if (memoryImportantOnly && !memory.important) return false;
     if (!query) return true;
@@ -1229,6 +1277,7 @@ function renderAll() {
   renderHome();
   renderLetters();
   renderTodayEntries();
+  renderArchives();
   renderMemories();
   renderSongs();
   renderSecretLock();
@@ -1247,52 +1296,50 @@ document.querySelectorAll("[data-go]").forEach((button) => {
   });
 });
 
-
-document.querySelectorAll("[data-app-nav]").forEach((button) => {
-  button.addEventListener("click", () => showHomeZone(button.dataset.appNav));
+document.querySelectorAll("[data-home-tab]").forEach((button) => {
+  button.addEventListener("click", () => showHomeTab(button.dataset.homeTab));
 });
 
 const themeButton = byId("theme-button");
-const settingsButton = byId("settings-button");
 const themePopover = byId("theme-popover");
 const themeClose = byId("theme-close");
 
-function setSettingsOpen(open) {
-  if (!themePopover) return;
-  themePopover.hidden = !open;
-  themeButton?.setAttribute("aria-expanded", open ? "true" : "false");
-  settingsButton?.setAttribute("aria-expanded", open ? "true" : "false");
-}
-
-[themeButton, settingsButton].filter(Boolean).forEach((button) => {
-  button.addEventListener("click", (event) => {
+if (themeButton && themePopover) {
+  themeButton.addEventListener("click", (event) => {
     event.stopPropagation();
-    setSettingsOpen(themePopover?.hidden ?? true);
+    const nextHidden = !themePopover.hidden ? true : false;
+    themePopover.hidden = nextHidden;
+    themeButton.setAttribute("aria-expanded", nextHidden ? "false" : "true");
   });
-});
 
-if (themePopover) {
   themePopover.addEventListener("click", (event) => event.stopPropagation());
-  document.addEventListener("click", () => setSettingsOpen(false));
+
+  document.addEventListener("click", () => {
+    if (!themePopover.hidden) {
+      themePopover.hidden = true;
+      themeButton.setAttribute("aria-expanded", "false");
+    }
+  });
 }
 
 if (themeClose) {
   themeClose.addEventListener("click", () => {
-    setSettingsOpen(false);
+    themePopover.hidden = true;
+    themeButton?.setAttribute("aria-expanded", "false");
   });
 }
 
 document.querySelectorAll("[data-theme-choice]").forEach((button) => {
   button.addEventListener("click", () => {
     applyTheme(button.dataset.themeChoice);
-    setSettingsOpen(false);
+    themePopover.hidden = true;
+    themeButton?.setAttribute("aria-expanded", "false");
     showToast(`已经换成${button.querySelector("strong")?.textContent || "新"}主题。`);
   });
 });
 
 applyTheme(loadTheme(), false);
-updateDaypart();
-renderHomeZone("home");
+showHomeTab(activeHomeTab);
 
 byId("open-letter-editor").addEventListener("click", () => openLetterEditor());
 byId("close-letter-editor").addEventListener("click", closeLetterEditor);
@@ -1964,15 +2011,13 @@ window.addEventListener("appinstalled", () => {
 
 const now = new Date();
 const dateElement = byId("today-date");
-if (dateElement) {
-  dateElement.dateTime = now.toISOString();
-  dateElement.textContent = new Intl.DateTimeFormat("zh-CN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  }).format(now);
-}
+dateElement.dateTime = now.toISOString();
+dateElement.textContent = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  weekday: "long",
+}).format(now);
 
 const startDate = new Date(`${RELATIONSHIP_START}T00:00:00`);
 const todaySerial = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2024,7 +2069,7 @@ window.addEventListener("hashchange", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=19", { updateViaCache: "none" });
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=16", { updateViaCache: "none" });
       registration.update().catch(() => {});
     } catch (error) {
       console.error("离线服务注册失败", error);

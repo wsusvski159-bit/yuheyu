@@ -1,21 +1,20 @@
 "use strict";
 
 const CACHE_PREFIX = "our-timed-memories-";
-const CACHE_NAME = `${CACHE_PREFIX}shell-v15`;
+const CACHE_NAME = `${CACHE_PREFIX}shell-v12`;
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=19",
-  "./app.js?v=19",
-  "./diary.js?v=19",
-  "./sync.js?v=19",
-  "./observation.js?v=19",
-  "./shop.js?v=19",
+  "./style.css?v=16",
+  "./app.js?v=16",
+  "./diary.js?v=16",
+  "./sync.js?v=16",
+  "./observation.js?v=16",
+  "./shop.js?v=16",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
-  "./icons/diary-window.svg",
 ];
 
 self.addEventListener("install", (event) => {
