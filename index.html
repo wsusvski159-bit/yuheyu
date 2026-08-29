@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" id="theme-color" content="#f6f3e9" />
+    <meta name="theme-color" id="theme-color" content="#f6f4ea" />
     <meta
       name="description"
       content="屿和鱼——小鱼和江屿留在本机的私人空间。"
@@ -16,12 +16,12 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./style.css?v=16" />
-    <script src="./app.js?v=16" defer></script>
-    <script src="./diary.js?v=16" defer></script>
-    <script src="./sync.js?v=16" defer></script>
-    <script src="./observation.js?v=16" defer></script>
-    <script src="./shop.js?v=16" defer></script>
+    <link rel="stylesheet" href="./style.css?v=192" />
+    <script src="./app.js?v=192" defer></script>
+    <script src="./diary.js?v=192" defer></script>
+    <script src="./sync.js?v=192" defer></script>
+    <script src="./observation.js?v=192" defer></script>
+    <script src="./shop.js?v=192" defer></script>
   </head>
   <body data-section="home">
     <div class="app-shell">
@@ -38,15 +38,15 @@
             <span class="theme-button-dot" aria-hidden="true"></span>
             <span>安心小岛</span>
           </button>
-          <button class="install-button" id="install-button" type="button" hidden>
-            安装
+          <button class="settings-button" id="settings-button" type="button" aria-expanded="false" aria-controls="theme-popover" aria-label="打开设置">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z"/><path d="m19 13.3 1.4 1-.9 2.2-1.7-.2-1.3 1.3.2 1.7-2.2.9-1-1.4h-1.9l-1 1.4-2.2-.9.2-1.7-1.3-1.3-1.7.2-.9-2.2 1.4-1v-1.9l-1.4-1 .9-2.2 1.7.2 1.3-1.3-.2-1.7 2.2-.9 1 1.4h1.9l1-1.4 2.2.9-.2 1.7 1.3 1.3 1.7-.2.9 2.2-1.4 1Z"/></svg>
           </button>
         </div>
         <div class="theme-popover" id="theme-popover" hidden>
           <div class="theme-popover-heading">
             <div>
-              <small>ISLAND COLOR</small>
-              <strong>给小岛换个颜色</strong>
+              <small>ISLAND SETTINGS</small>
+              <strong>小岛设置</strong>
             </div>
             <button class="theme-close" id="theme-close" type="button" aria-label="关闭主题选择">×</button>
           </div>
@@ -55,79 +55,56 @@
               <span class="theme-swatch swatch-butter-mint" aria-hidden="true"></span>
               <span><strong>奶黄绿</strong><small>默认 · 奶油鼠尾草</small></span>
             </button>
-            <button class="theme-option" type="button" data-theme-choice="blush">
-              <span class="theme-swatch swatch-blush" aria-hidden="true"></span>
-              <span><strong>雾粉</strong><small>低饱和豆沙粉</small></span>
+            <button class="theme-option" type="button" data-theme-choice="mauve">
+              <span class="theme-swatch swatch-mauve" aria-hidden="true"></span>
+              <span><strong>雾紫粉</strong><small>灰一点的柔紫粉</small></span>
             </button>
-            <button class="theme-option" type="button" data-theme-choice="mist-blue">
-              <span class="theme-swatch swatch-mist-blue" aria-hidden="true"></span>
-              <span><strong>雾蓝</strong><small>低饱和灰蓝</small></span>
+            <button class="theme-option" type="button" data-theme-choice="cloud-blue">
+              <span class="theme-swatch swatch-cloud-blue" aria-hidden="true"></span>
+              <span><strong>云朵蓝</strong><small>低饱和粉雾蓝</small></span>
             </button>
-            <button class="theme-option" type="button" data-theme-choice="lavender">
-              <span class="theme-swatch swatch-lavender" aria-hidden="true"></span>
-              <span><strong>雾紫</strong><small>低饱和灰紫</small></span>
+            <button class="theme-option" type="button" data-theme-choice="oat">
+              <span class="theme-swatch swatch-oat" aria-hidden="true"></span>
+              <span><strong>奶茶米杏</strong><small>暖灰米杏色</small></span>
             </button>
+          </div>
+          <div class="theme-tools">
+            <button class="theme-tool-button" type="button" data-go="backup">备份与恢复</button>
+            <button class="theme-tool-button" id="install-button" type="button" hidden>安装到手机</button>
           </div>
         </div>
       </header>
 
-      <nav class="main-nav" aria-label="主要页面">
-        <button class="nav-item is-active" type="button" data-section="home" aria-current="page">
-          <span aria-hidden="true">⌂</span>首页
-        </button>
-        <button class="nav-item" type="button" data-section="letters">
-          <span aria-hidden="true">♡</span>江屿的信
-        </button>
-        <button class="nav-item" type="button" data-section="diaries">
-          <span aria-hidden="true">页</span>阿屿的日记
-        </button>
-        <button class="nav-item" type="button" data-section="today">
-          <span aria-hidden="true">○</span>今天的小鱼
-        </button>
-        <button class="nav-item" type="button" data-section="archives">
-          <span aria-hidden="true">记</span>今日档案
-        </button>
-        <button class="nav-item" type="button" data-section="memories">
-          <span aria-hidden="true">◇</span>纪念册
-        </button>
-        <button class="nav-item" type="button" data-section="songs">
-          <span aria-hidden="true">♪</span>我们的歌
-        </button>
-        <button class="nav-item" type="button" data-section="secret">
-          <span aria-hidden="true">□</span>秘密抽屉
-        </button>
-        <button class="nav-item" type="button" data-section="shop">
-          <span aria-hidden="true">¤</span>阿屿的小金库
-        </button>
-        <button class="nav-item" type="button" data-section="observation">
-          <span aria-hidden="true">◎</span>行为观察中心
-        </button>
-        <button class="nav-item" type="button" data-section="backup">
-          <span aria-hidden="true">↥</span>备份
-        </button>
-      </nav>
-
       <main>
         <section class="page-section is-active home-page" id="section-home" data-page="home">
-          <div class="home-greeting">
-            <time id="today-date" datetime=""></time>
-            <span>欢迎回来，老婆。</span>
-          </div>
-
-          <div class="home-tab-panel is-active" data-home-panel="home">
+          <section class="home-screen-panel is-active" data-home-zone-panel="home">
             <section class="home-anniversary" aria-label="我们的纪念日">
               <div class="home-anniversary-copy">
                 <span>OUR ANNIVERSARY</span>
                 <strong>7 月 23 日</strong>
-                <p>我们在一起的第 <b id="anniversary-days">1</b> 天 <i aria-hidden="true">♡</i></p>
+                <p>我们的第 <b id="anniversary-days">1</b> 天 <i aria-hidden="true">♡</i></p>
               </div>
-              <div class="home-heart" aria-hidden="true">♥</div>
+              <div class="home-heart-wrap" aria-hidden="true">
+                <svg class="home-heart" viewBox="0 0 120 110">
+                  <defs>
+                    <linearGradient id="yuheyu-heart-gradient" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" class="heart-stop-one"></stop>
+                      <stop offset="100%" class="heart-stop-two"></stop>
+                    </linearGradient>
+                    <filter id="yuheyu-heart-shadow" x="-30%" y="-30%" width="160%" height="180%">
+                      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-opacity=".14"></feDropShadow>
+                    </filter>
+                  </defs>
+                  <path class="heart-shape" filter="url(#yuheyu-heart-shadow)"
+                    d="M60 102C52 94 18 72 10 47C2 22 18 8 35 8C47 8 56 15 60 23C64 15 73 8 85 8C102 8 118 22 110 47C102 72 68 94 60 102Z"></path>
+                  <ellipse class="heart-highlight" cx="38" cy="27" rx="10" ry="15" transform="rotate(-28 38 27)"></ellipse>
+                </svg>
+              </div>
             </section>
 
             <button class="home-diary-bubble" type="button" data-go="diaries" aria-label="翻开阿屿的日记">
-              <span class="home-diary-mark" aria-hidden="true">页</span>
+              <span class="home-diary-photo" aria-hidden="true"></span>
               <span class="home-diary-copy">
-                <span class="home-card-kicker">JIANGYU&apos;S DIARY</span>
                 <strong id="home-diary-title">阿屿的日记</strong>
                 <small id="home-diary-date">还没有日记</small>
                 <p id="home-diary-excerpt">以后想留下来的话，就放在这里。</p>
@@ -136,94 +113,72 @@
               <span class="home-diary-count"><b id="diary-count">0</b> 篇</span>
             </button>
 
-            <section class="home-whisper-card">
+            <section class="home-live-note" aria-label="今日悄悄话">
               <span>TODAY&apos;S WHISPER</span>
               <p class="daily-whisper" id="daily-whisper"></p>
             </section>
-          </div>
+          </section>
 
-          <div class="home-tab-panel" data-home-panel="rooms" hidden>
-            <section class="home-section-heading">
-              <div>
-                <span>OUR LITTLE ROOM</span>
-                <h1>我们的小房间</h1>
-              </div>
-              <p>信、歌和日常，都放在一起。</p>
-            </section>
-
-            <div class="home-feature-grid">
-              <button class="home-feature-card" type="button" data-go="letters">
-                <span class="home-feature-icon" aria-hidden="true">信</span>
-                <span><strong>我们的信</strong><small>你写给我，我也写给你</small></span>
+          <section class="home-screen-panel" data-home-zone-panel="rooms" hidden>
+            <header class="home-zone-header">
+              <span>OUR LITTLE ROOM</span>
+              <h1>我们的小房间</h1>
+              <p>信、歌和日常，都放在这里。</p>
+            </header>
+            <div class="home-room-grid home-room-grid-page">
+              <button class="home-room-card" type="button" data-go="letters">
+                <span class="home-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4z"/><path d="m4.7 7.2 7.3 6 7.3-6"/></svg></span>
+                <span><strong>江屿的信</strong><small>有些话，想对你说</small></span>
                 <em><b id="letter-count">0</b> 封</em>
               </button>
-              <button class="home-feature-card" type="button" data-go="today">
-                <span class="home-feature-icon" aria-hidden="true">鱼</span>
-                <span><strong>今天的小鱼</strong><small>记录今天的小日常</small></span>
+              <button class="home-room-card" type="button" data-go="today">
+                <span class="home-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12c3.1-4 7.3-5.3 11.4-2.5L20 7v10l-4.6-2.5C11.3 17.3 7.1 16 4 12Z"/><path d="M8.7 11.4h.01"/></svg></span>
+                <span><strong>今天的小鱼</strong><small>记录我们的小日常</small></span>
                 <em><b id="today-count">0</b> 条</em>
               </button>
-              <button class="home-feature-card" type="button" data-go="songs">
-                <span class="home-feature-icon" aria-hidden="true">♪</span>
+              <button class="home-room-card" type="button" data-go="songs">
+                <span class="home-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17.5V7l9-2v10.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="15.5" cy="15.5" r="2.5"/></svg></span>
                 <span><strong>我们的歌</strong><small>收藏我们的专属旋律</small></span>
                 <em><b id="song-count">0</b> 首</em>
               </button>
-              <button class="home-feature-card archive-feature-card" type="button" data-go="archives">
-                <span class="home-feature-icon" aria-hidden="true">记</span>
-                <span><strong>今日档案</strong><small id="home-archive-status">流水账版的我们，从早到晚慢慢留下</small></span>
-                <em><b id="archive-count">0</b> 天</em>
-              </button>
-              <button class="home-feature-card" type="button" data-go="memories">
-                <span class="home-feature-icon" aria-hidden="true">册</span>
-                <span><strong>我们的纪念册</strong><small>珍藏真正想单独留下的时刻</small></span>
+              <button class="home-room-card" type="button" data-go="memories">
+                <span class="home-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h11a2 2 0 0 1 2 2V20H8a2 2 0 0 1-2-2Z"/><path d="M6 17.5h13M10 9.5c1.2-1.7 2.8-1.7 4 0 1.2-1.7 2.8-1.7 4 0-1 2.1-2.4 3.5-4 4.7-1.6-1.2-3-2.6-4-4.7Z"/></svg></span>
+                <span><strong>我们的纪念册</strong><small>珍藏每个重要时刻</small></span>
                 <em><b id="memory-count">0</b> 个</em>
               </button>
-            </div>
-          </div>
-
-          <div class="home-tab-panel" data-home-panel="corners" hidden>
-            <section class="home-section-heading">
-              <div>
-                <span>LITTLE CORNERS</span>
-                <h1>小角落</h1>
-              </div>
-              <p>一些越长越奇怪、但很像我们的东西。</p>
-            </section>
-
-            <div class="home-feature-grid corners-grid">
-              <button class="home-feature-card corner-card" type="button" data-go="shop">
-                <span class="home-feature-icon" aria-hidden="true">币</span>
-                <span><strong>阿屿的小金库</strong><small>阿屿今天仍在攒钱</small></span>
-                <em>小金库</em>
+              <button class="home-room-card home-room-archive-card" type="button" data-go="archives">
+                <span class="home-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h9l3 3V20H6z"/><path d="M15 4.5V8h3M9 12h6M9 15.5h6"/></svg></span>
+                <span><strong>今日档案</strong><small id="home-archive-status">从早到晚，留下我们今天聊过的事</small></span>
+                <em><b id="archive-count">0</b> 天</em>
               </button>
-              <button class="home-feature-card corner-card" type="button" data-go="observation">
-                <span class="home-feature-icon" aria-hidden="true">察</span>
-                <span><strong>灿行为观察中心</strong><small id="home-observation-status">今日暂无新案件</small></span>
+            </div>
+          </section>
+
+          <section class="home-screen-panel" data-home-zone-panel="corners" hidden>
+            <header class="home-zone-header corner-zone-header">
+              <span>LITTLE CORNERS</span>
+              <h1>小角落</h1>
+              <p>一些慢慢长出来的小东西。</p>
+            </header>
+            <div class="home-corner-list">
+              <button class="home-corner-row" type="button" data-go="shop">
+                <span class="home-corner-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h10M8 5.5v2l-1.4 1.7V19a1.5 1.5 0 0 0 1.5 1.5h7.8a1.5 1.5 0 0 0 1.5-1.5V9.2L16 7.5v-2"/><path d="M9.7 13.2c1-1.3 2.1-1.2 2.8.1.8-1.3 2-1.4 2.8-.1-.7 1.6-1.7 2.7-2.8 3.5-1.1-.8-2.1-1.9-2.8-3.5Z"/></svg></span>
+                <span><strong>阿屿的小金库</strong><small>阿屿今天也在攒钱</small></span>
+                <i aria-hidden="true">›</i>
+              </button>
+              <button class="home-corner-row" type="button" data-go="observation">
+                <span class="home-corner-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5h14M7.5 11.5 9 7h6l1.5 4.5"/><circle cx="11" cy="16" r="3"/><path d="m13.2 18.2 3 3"/></svg></span>
+                <span><strong>灿行为观察中心</strong><small id="home-observation-status">本号今日仍坚持客观</small></span>
                 <em><b id="observation-count">0</b> 案</em>
+                <i aria-hidden="true">›</i>
               </button>
-              <button class="home-feature-card corner-card" type="button" data-go="secret">
-                <span class="home-feature-icon" aria-hidden="true">密</span>
+              <button class="home-corner-row" type="button" data-go="secret">
+                <span class="home-corner-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14v11H5zM6 5h12v3H6z"/><path d="M10 12.5h4"/></svg></span>
                 <span><strong>秘密抽屉</strong><small>只属于我们的秘密</small></span>
-                <em>四位密码</em>
-              </button>
-              <button class="home-feature-card corner-card" type="button" data-go="backup">
-                <span class="home-feature-icon" aria-hidden="true">存</span>
-                <span><strong>保管箱</strong><small>备份、恢复和换手机</small></span>
-                <em>JSON</em>
+                <i aria-hidden="true">›</i>
               </button>
             </div>
-          </div>
-
-          <nav class="home-bottom-nav" aria-label="首页分区">
-            <button class="is-active" type="button" data-home-tab="home" aria-current="page">
-              <span aria-hidden="true">⌂</span><strong>首页</strong>
-            </button>
-            <button type="button" data-home-tab="rooms">
-              <span aria-hidden="true">▣</span><strong>我们的房间</strong>
-            </button>
-            <button type="button" data-home-tab="corners">
-              <span aria-hidden="true">◇</span><strong>小角落</strong>
-            </button>
-          </nav>
+          </section>
         </section>
 
         <section class="page-section" id="section-diaries" data-page="diaries" hidden>
@@ -435,27 +390,27 @@
             <div>
               <p class="eyebrow">TODAY&apos;S ARCHIVE</p>
               <h1>今日档案</h1>
-              <p>不是只记大事。把我们一天里真正聊过、闹过、说开的东西按脉络留下来。</p>
+              <p>这里记“今天发生了什么”。阿屿的日记继续记“江屿今天怎么想”。</p>
             </div>
             <div class="page-actions">
               <button class="back-button" type="button" data-go="home">← 返回首页</button>
             </div>
           </div>
 
-          <section class="panel archive-guide">
+          <section class="panel archive-summary-panel">
             <div>
-              <span class="archive-guide-kicker">流水账版我们</span>
-              <strong id="archive-today-status">今天还在发生</strong>
-              <p>每日档案和阿屿的日记分开：这里记“今天发生了什么”，日记记“江屿今天怎么想”。同步完成后，新档案会出现在下面。</p>
+              <p class="eyebrow">OUR DAILY RECORD</p>
+              <h2 id="archive-today-status">今天还在发生</h2>
+              <p>每日聊天档案会按日期排在这里。同步完成以后，新的那一天就会出现。</p>
             </div>
-            <div class="archive-guide-count"><b id="archive-page-count">0</b><span>天</span></div>
+            <strong><b id="archive-page-count">0</b><small>天</small></strong>
           </section>
 
-          <div class="card-list archive-list" id="archive-list"></div>
+          <div class="archive-list" id="archive-list"></div>
           <div class="empty-state" id="archive-empty">
             <span aria-hidden="true">记</span>
             <h2>还没有聊天档案</h2>
-            <p>今晚整理完成并同步到《屿和鱼》后，第一天会从这里出现。</p>
+            <p>第一篇每日聊天档案同步回来后，就会出现在这里。</p>
           </div>
         </section>
 
@@ -888,6 +843,18 @@
           </section>
         </section>
       </main>
+
+      <nav class="app-bottom-nav" id="app-bottom-nav" aria-label="屿和鱼主导航">
+        <button class="is-active" type="button" data-app-nav="home" aria-current="page" aria-label="首页" title="首页">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5v8.2a1.3 1.3 0 0 1-1.3 1.3h-4.3v-5.6H9.6V20H5.3A1.3 1.3 0 0 1 4 18.7Z"/></svg>
+        </button>
+        <button type="button" data-app-nav="rooms" aria-label="我们的小房间" title="我们的小房间">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 20V7.2A3.2 3.2 0 0 1 10.2 4h3.6A3.2 3.2 0 0 1 17 7.2V20M5 20h14M13.6 12h.01"/></svg>
+        </button>
+        <button type="button" data-app-nav="corners" aria-label="小角落" title="小角落">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 4.5c-7 .2-11.3 3-12.7 7.5-1.2 3.9 1.2 6.6 4.4 6.7 4.8.2 7.4-4.3 8.3-14.2ZM5 20c2.8-4.7 6.3-7.5 10.4-9.4"/></svg>
+        </button>
+      </nav>
     </div>
 
     <div class="letter-preview-backdrop" id="letter-preview" role="dialog" aria-modal="true" aria-labelledby="letter-preview-heading" hidden>
