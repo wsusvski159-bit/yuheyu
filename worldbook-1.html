@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f4ea" />
+  <title>世界书 · 屿和鱼</title>
+  <style>
+    :root {
+      --bg:#f6f4ea; --paper:#fffdf7; --paper2:#f2efe3; --ink:#3d463f; --muted:#7d867f;
+      --line:#dfe2d4; --accent:#93a88f; --accent2:#c7d2bb; --accent3:#e9eedf; --danger:#a86e6e;
+      --shadow:0 14px 34px rgba(67,78,68,.10); --radius:24px;
+    }
+    html[data-theme="mauve"] { --bg:#f5f1f2; --paper:#fffafa; --paper2:#eee6e9; --ink:#51464b; --muted:#8e7d84; --line:#e1d6da; --accent:#aa909b; --accent2:#d8c4cb; --accent3:#f0e6e9; }
+    html[data-theme="cloud-blue"] { --bg:#f2f4f5; --paper:#fbfdfe; --paper2:#e8edef; --ink:#455157; --muted:#79878e; --line:#d6dfe3; --accent:#8fa5af; --accent2:#c4d2d8; --accent3:#e5ecef; }
+    html[data-theme="oat"] { --bg:#f6f1e9; --paper:#fffaf3; --paper2:#eee4d6; --ink:#544a3f; --muted:#887c6f; --line:#e1d6c7; --accent:#ad987f; --accent2:#d9c9b4; --accent3:#f0e7db; }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 84%,white));color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .shell{max-width:920px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(88px + env(safe-area-inset-bottom))}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+    .back,.ghost,.primary,.chip,.icon-btn{border:0;border-radius:999px;background:var(--paper);box-shadow:0 4px 16px rgba(60,70,60,.07);padding:10px 14px;text-decoration:none;color:var(--ink)}
+    .top-actions{display:flex;gap:8px;align-items:center}
+    .primary{background:var(--accent);color:white;font-weight:700}
+    .hero{background:linear-gradient(145deg,var(--paper),var(--accent3));border:1px solid color-mix(in srgb,var(--line) 72%,transparent);border-radius:30px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-80px;background:color-mix(in srgb,var(--accent2) 48%,transparent);filter:blur(1px)}
+    .eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:800}
+    h1{font-size:31px;margin:6px 0 8px;letter-spacing:.04em}.hero p{margin:0;color:var(--muted);line-height:1.7;max-width:690px}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}.stat{background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.65);border-radius:16px;padding:9px 12px;min-width:92px}.stat b{display:block;font-size:20px}.stat small{color:var(--muted)}
+    .tools{margin:18px 0 12px;display:grid;grid-template-columns:1fr auto;gap:10px}.search{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:13px 15px;outline:none;min-width:0}.search:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+    .chips{display:flex;gap:8px;overflow:auto;padding:4px 1px 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;padding:8px 13px;border:1px solid var(--line);box-shadow:none;background:color-mix(in srgb,var(--paper) 85%,transparent)}.chip.is-active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .notice{display:none;margin:8px 0 14px;padding:12px 14px;border-radius:16px;background:var(--accent3);color:var(--ink);line-height:1.55;font-size:14px}.notice.show{display:block}.notice.error{background:#f7e8e8;color:#784b4b}
+    .list{display:grid;gap:12px}.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 8px 24px rgba(66,75,66,.06);position:relative}.card-top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}.card h2{font-size:18px;margin:0 0 8px;line-height:1.4}.card p{margin:11px 0 0;white-space:pre-wrap;line-height:1.72;color:#59635c;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--accent3);color:#657264}.badge.important{background:color-mix(in srgb,var(--accent) 22%,white);font-weight:700}.card-meta{font-size:12px;color:var(--muted);margin-top:12px;display:flex;justify-content:space-between;gap:8px;align-items:center}.card-actions{display:flex;gap:6px}.icon-btn{padding:7px 10px;box-shadow:none;background:var(--paper2);font-size:13px}.icon-btn.danger{color:var(--danger)}
+    .empty{text-align:center;padding:48px 20px;color:var(--muted);background:var(--paper);border:1px dashed var(--line);border-radius:22px}.empty b{display:block;color:var(--ink);margin-bottom:7px}
+    dialog{width:min(680px,calc(100% - 24px));border:0;border-radius:26px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(40,48,41,.25)}dialog::backdrop{background:rgba(39,47,41,.42);backdrop-filter:blur(3px)}
+    .modal{padding:22px}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.modal h3{margin:0;font-size:22px}.close{border:0;background:var(--paper2);width:36px;height:36px;border-radius:50%;font-size:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:700;color:var(--muted)}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:15px;background:#fff;padding:11px 12px;outline:none}.field textarea{min-height:230px;resize:vertical;line-height:1.6}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent)}
+    .check{display:flex;align-items:center;gap:8px;font-size:14px}.modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.muted-button{border:1px solid var(--line);background:transparent;border-radius:14px;padding:10px 15px}.save-button{border:0;background:var(--accent);color:white;border-radius:14px;padding:10px 17px;font-weight:800}
+    .footnote{text-align:center;color:var(--muted);font-size:12px;line-height:1.6;margin-top:20px}
+    @media(max-width:600px){.shell{padding-left:14px;padding-right:14px}.hero{padding:20px}.hero h1{font-size:27px}.tools{grid-template-columns:1fr}.tools .primary{width:100%}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.top .back{padding:9px 11px}.card{padding:16px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <a class="back" href="./index.html">← 屿和鱼</a>
+      <div class="top-actions">
+        <button class="ghost" id="sync-btn" type="button">同步</button>
+        <button class="primary" id="add-btn" type="button">＋ 新词条</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="eyebrow">YU & FISH · LIVING WORLDBOOK</div>
+      <h1>我们的世界书</h1>
+      <p>不是把灿写成一份固定说明书。这里只放长期、可复用、值得在新窗口重新取回的东西；最近状态交给跨聊天摘要，具体发生过的事交给日记和档案。</p>
+      <div class="stats">
+        <div class="stat"><b id="count-all">0</b><small>词条</small></div>
+        <div class="stat"><b id="count-important">0</b><small>高优先级</small></div>
+        <div class="stat"><b id="count-updated">—</b><small>最近更新</small></div>
+      </div>
+    </section>
+
+    <div class="tools">
+      <input class="search" id="search" type="search" placeholder="搜：称呼、冲突、画画、食物、Dirty Talk…" autocomplete="off" />
+      <button class="primary" id="refresh-btn" type="button">重新读取</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="notice" id="notice"></div>
+    <section class="list" id="list" aria-live="polite"></section>
+    <p class="footnote">世界书 v1 · 使用现有纪念册数据作为唯一长期数据源 · “世界书”标签用于识别词条</p>
+  </main>
+
+  <dialog id="editor">
+    <form class="modal" id="form" method="dialog">
+      <div class="modal-head">
+        <h3 id="editor-title">新建世界书词条</h3>
+        <button class="close" id="close-btn" type="button" aria-label="关闭">×</button>
+      </div>
+      <input id="entry-id" type="hidden" />
+      <div class="grid">
+        <div class="field full"><label for="title">标题</label><input id="title" maxlength="160" required placeholder="例如：【世界书·长期】最近稳定偏好" /></div>
+        <div class="field"><label for="category">类型</label><select id="category"><option>核心</option><option>修正</option><option>词典</option><option>长期</option><option>项目</option><option>亲密</option><option>其他</option></select></div>
+        <div class="field"><label for="confidence">确认度</label><select id="confidence"><option value="确认:明确">明确确认</option><option value="确认:推断">推断 / 需要复核</option><option value="确认:可能过期">可能过期</option></select></div>
+        <div class="field full"><label for="tags">关键词 / 标签（逗号分隔）</label><input id="tags" maxlength="360" placeholder="例如：食物, 兴趣, 学校" /></div>
+        <div class="field full"><label for="text">正文</label><textarea id="text" maxlength="20000" required placeholder="只写长期可复用的内容；具体某一天发生的事更适合放进日记。"></textarea></div>
+        <div class="field full"><label class="check"><input id="important" type="checkbox" /> 高优先级：冲突修正、核心边界等需要优先检索</label></div>
+      </div>
+      <div class="modal-foot"><button class="muted-button" id="cancel-btn" type="button">取消</button><button class="save-button" type="submit">保存词条</button></div>
+    </form>
+  </dialog>
+
+<script>
+"use strict";
+const STORAGE_KEY="our-timed-memories.v1";
+const SYNC_CONFIG_KEY="yuheyu.mcp-sync.v1";
+const SYNC_COLLECTIONS=["letters","jiangyuDiaries","todayEntries","memories","songs"];
+const CATEGORY_TAG={核心:"核心",修正:"修正",词典:"词典",长期:"长期偏好",项目:"项目",亲密:"亲密偏好",其他:"其他"};
+const CATEGORIES=["全部","核心","修正","词典","长期","项目","亲密","其他"];
+let selectedCategory="全部";
+let query="";
+let state=loadState();
+
+function $(id){return document.getElementById(id)}
+function loadTheme(){try{const t=localStorage.getItem("yuheyu.theme.v1");return t==="lavender"||t==="blush"?"mauve":t==="mist-blue"?"cloud-blue":t||"butter-mint"}catch{return"butter-mint"}}
+document.documentElement.dataset.theme=loadTheme();
+
+function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")||{}}catch{return{}}}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+function now(){return new Date().toISOString()}
+function dateKey(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function id(){return crypto.randomUUID?crypto.randomUUID():`wb-${Date.now()}-${Math.random().toString(16).slice(2)}`}
+function tagsOf(item){return Array.isArray(item?.tags)?item.tags:[]}
+function isWorldbook(item){const t=tagsOf(item);return t.includes("世界书")||String(item?.title||"").includes("BDSM / Dirty Talk 升级笔记")}
+function categoryOf(item){const t=tagsOf(item),title=String(item?.title||"");if(t.includes("核心")||title.includes("·核心"))return"核心";if(t.includes("修正")||title.includes("·修正"))return"修正";if(t.includes("词典")||title.includes("·词典"))return"词典";if(t.includes("长期偏好")||title.includes("·长期"))return"长期";if(t.includes("项目")||title.includes("·项目"))return"项目";if(t.includes("亲密偏好")||t.includes("BDSM")||title.includes("Dirty Talk"))return"亲密";return"其他"}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function compactDate(s){if(!s)return"—";const d=new Date(s);if(Number.isNaN(d.getTime()))return String(s);return `${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`}
+function timeOf(item){return Date.parse(item.updatedAt||item.createdAt||`${item.date||"1970-01-01"}T00:00:00Z`)||0}
+function entries(){return (Array.isArray(state.memories)?state.memories:[]).filter(isWorldbook).sort((a,b)=>(b.important?1:0)-(a.important?1:0)||timeOf(b)-timeOf(a))}
+
+function showNotice(text,error=false){const n=$("notice");n.textContent=text;n.className=`notice show${error?" error":""}`;clearTimeout(showNotice.t);showNotice.t=setTimeout(()=>n.className="notice",4500)}
+
+function renderChips(){const counts=Object.fromEntries(CATEGORIES.map(c=>[c,0]));const all=entries();counts.全部=all.length;for(const e of all)counts[categoryOf(e)]++;$("chips").innerHTML=CATEGORIES.map(c=>`<button class="chip ${selectedCategory===c?"is-active":""}" data-cat="${c}">${c} · ${counts[c]}</button>`).join("");document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{selectedCategory=b.dataset.cat;render()})}
+function renderStats(){const all=entries();$("count-all").textContent=all.length;$("count-important").textContent=all.filter(x=>x.important).length;$("count-updated").textContent=all.length?compactDate(new Date(Math.max(...all.map(timeOf))).toISOString()):"—"}
+function render(){state=loadState();const q=query.trim().toLowerCase();let list=entries().filter(e=>selectedCategory==="全部"||categoryOf(e)===selectedCategory);if(q)list=list.filter(e=>[e.title,e.text,...tagsOf(e)].join("\n").toLowerCase().includes(q));renderChips();renderStats();if(!list.length){$("list").innerHTML=`<div class="empty"><b>${q||selectedCategory!=="全部"?"没有匹配的词条":"世界书还是空的"}</b>${q?"换个关键词试试。":"点右上角“新词条”开始写。"}</div>`;return}$("list").innerHTML=list.map(e=>{const tags=tagsOf(e).filter(t=>t!=="世界书").slice(0,8);return `<article class="card"><div class="card-top"><div><div class="badges"><span class="badge">${esc(categoryOf(e))}</span>${e.important?'<span class="badge important">高优先级</span>':""}${tags.map(t=>`<span class="badge">${esc(t)}</span>`).join("")}</div><h2>${esc(e.title||"未命名词条")}</h2></div></div><p>${esc(e.text||"")}</p><div class="card-meta"><span>${esc(e.date||"")} · ${e.updatedAt?"已更新":"创建"}</span><span class="card-actions"><button class="icon-btn" data-edit="${esc(e.id)}">编辑</button><button class="icon-btn danger" data-del="${esc(e.id)}">删除</button></span></div></article>`}).join("");document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEditor(b.dataset.edit));document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>removeEntry(b.dataset.del))}
+
+function openEditor(entryId=""){const e=entryId?entries().find(x=>x.id===entryId):null;$("editor-title").textContent=e?"编辑世界书词条":"新建世界书词条";$("entry-id").value=e?.id||"";$("title").value=e?.title||"";$("category").value=e?categoryOf(e):"长期";const conf=tagsOf(e).find(t=>t.startsWith("确认:"))||"确认:明确";$("confidence").value=conf;$("tags").value=tagsOf(e).filter(t=>t!=="世界书"&&!Object.values(CATEGORY_TAG).includes(t)&&!t.startsWith("确认:")).join(", ");$("text").value=e?.text||"";$("important").checked=Boolean(e?.important);const d=$("editor");if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","")}
+function closeEditor(){const d=$("editor");if(typeof d.close==="function")d.close();else d.removeAttribute("open")}
+function parseTags(raw){return [...new Set(String(raw||"").split(/[,，]/).map(x=>x.trim()).filter(Boolean))].slice(0,12)}
+function saveEntry(){state=loadState();if(!Array.isArray(state.memories))state.memories=[];const entryId=$("entry-id").value;const idx=state.memories.findIndex(x=>x?.id===entryId);const old=idx>=0?state.memories[idx]:null;const category=$("category").value;const tags=["世界书",CATEGORY_TAG[category]||"其他",$("confidence").value,...parseTags($("tags").value)];const e={id:old?.id||id(),date:old?.date||dateKey(),title:$("title").value.trim(),text:$("text").value.trim(),image:old?.image||"",important:$("important").checked,tags:[...new Set(tags)].slice(0,12),createdAt:old?.createdAt||now(),updatedAt:old?now():""};if(!e.title||!e.text){showNotice("标题和正文都要写。",true);return false}if(idx>=0)state.memories[idx]=e;else state.memories.push(e);saveState();closeEditor();render();showNotice(old?"词条已经更新。":"词条已经放进世界书。 ");return true}
+function removeEntry(entryId){state=loadState();const e=(state.memories||[]).find(x=>x.id===entryId);if(!e)return;if(!confirm(`删除“${e.title}”？\n\n同步后其他设备也会删除这条记录。`))return;state.memories=state.memories.filter(x=>x.id!==entryId);if(!state.syncMeta||typeof state.syncMeta!=="object")state.syncMeta={deleted:{}};if(!state.syncMeta.deleted||typeof state.syncMeta.deleted!=="object")state.syncMeta.deleted={};if(!state.syncMeta.deleted.memories)state.syncMeta.deleted.memories={};state.syncMeta.deleted.memories[entryId]=now();saveState();render();showNotice("词条已删除；下次同步会带上删除记录。")}
+
+function readSyncConfig(){try{const v=JSON.parse(localStorage.getItem(SYNC_CONFIG_KEY)||"{}");return{serverUrl:typeof v.serverUrl==="string"?v.serverUrl.replace(/\/+$/,""):"",token:typeof v.token==="string"?v.token:""}}catch{return{serverUrl:"",token:""}}}
+function withoutImages(item){if(!item||typeof item!=="object")return item;const c={...item};if("image"in c)c.image="";return c}
+function makeSyncPayload(){return{dailyNote:{...(state.dailyNote||{})},letters:(state.letters||[]).map(withoutImages),jiangyuDiaries:(state.jiangyuDiaries||[]).map(withoutImages),todayEntries:(state.todayEntries||[]).map(withoutImages),memories:(state.memories||[]).map(withoutImages),songs:(state.songs||[]).map(withoutImages),observationPosts:JSON.parse(JSON.stringify(state.observationPosts||[])),messages:JSON.parse(JSON.stringify(state.messages||{})),syncMeta:JSON.parse(JSON.stringify(state.syncMeta||{deleted:{}}))}}
+function itemTime(x){return Date.parse(x?.updatedAt||x?.createdAt||(x?.date?`${x.date}T00:00:00.000Z`:""))||0}
+function mergeDeleted(a={},b={}){const out={};for(const c of SYNC_COLLECTIONS){out[c]={};const keys=new Set([...Object.keys(a?.[c]||{}),...Object.keys(b?.[c]||{})]);for(const k of keys){const av=a?.[c]?.[k]||"",bv=b?.[c]?.[k]||"";out[c][k]=Date.parse(bv)>Date.parse(av)?bv:av}}return out}
+function mergeCollection(a=[],b=[],deleted={}){const m=new Map();for(const x of [...a,...b]){if(!x?.id)continue;const cur=m.get(x.id);if(!cur||itemTime(x)>=itemTime(cur)){const next={...x};if(cur?.image&&!next.image)next.image=cur.image;m.set(x.id,next)}}for(const [k,t]of Object.entries(deleted)){const x=m.get(k);if(!x||Date.parse(t)>=itemTime(x))m.delete(k)}return[...m.values()]}
+function mergeRemote(remote){const del=mergeDeleted(state.syncMeta?.deleted,remote?.syncMeta?.deleted);for(const c of SYNC_COLLECTIONS)state[c]=mergeCollection(state[c],remote?.[c],del[c]);const newer=(a,b)=>(Date.parse(b?.savedAt||"")||0)>=(Date.parse(a?.savedAt||"")||0)?(b||a):(a||b);state.dailyNote=newer(state.dailyNote,remote?.dailyNote)||state.dailyNote;state.messages={xiaoyu:newer(state.messages?.xiaoyu,remote?.messages?.xiaoyu)||{text:"",savedAt:""},ai:newer(state.messages?.ai,remote?.messages?.ai)||{text:"",savedAt:""}};if(Array.isArray(remote?.observationPosts))state.observationPosts=remote.observationPosts;state.syncMeta={deleted:del}}
+async function syncNow(){const {serverUrl,token}=readSyncConfig();if(!serverUrl||!token){showNotice("还没有同步配置。先回《屿和鱼》设置里填写服务地址和同步口令。",true);return}const btn=$("sync-btn");btn.disabled=true;btn.textContent="同步中…";try{state=loadState();const r=await fetch(`${serverUrl}/api/sync`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({data:makeSyncPayload()})});let data=null;try{data=await r.json()}catch{}if(!r.ok)throw new Error(data?.error||`HTTP ${r.status}`);if(!data?.data)throw new Error("服务没有返回同步数据");mergeRemote(data.data);saveState();render();showNotice("世界书已经和《屿和鱼》双向同步。") }catch(err){showNotice(`同步失败：${err instanceof Error?err.message:"未知错误"}`,true)}finally{btn.disabled=false;btn.textContent="同步"}}
+
+$("search").addEventListener("input",e=>{query=e.target.value;render()});
+$("add-btn").onclick=()=>openEditor();$("refresh-btn").onclick=()=>{state=loadState();render();showNotice("已经重新读取本机《屿和鱼》。")};$("sync-btn").onclick=syncNow;$("close-btn").onclick=closeEditor;$("cancel-btn").onclick=closeEditor;$("form").addEventListener("submit",e=>{e.preventDefault();saveEntry()});
+$("editor").addEventListener("click",e=>{if(e.target===$("editor"))closeEditor()});
+window.addEventListener("storage",()=>render());
+render();
+</script>
+</body>
+</html>
