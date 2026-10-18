@@ -892,14 +892,6 @@ export function createTogetherWorker(
 
   if (cookie && !cookie.includes("MUSIC_U=")) {
     console.warn("NETEASE_COOKIE is set but MUSIC_U is missing; Together worker may not authenticate.");
-    console.warn("NETEASE_COOKIE format diagnostics", {
-      hasMusicUName: /MUSIC_U/i.test(cookie),
-      hasEquals: cookie.includes("="),
-      hasEncodedEquals: /%3d/i.test(cookie),
-      hasSemicolon: cookie.includes(";"),
-      hasQuote: /[\"']/.test(cookie),
-      hasCookieLabel: /cookie\s*:/i.test(cookie),
-    });
   }
 
   return new TogetherWorker({
